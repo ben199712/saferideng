@@ -1,0 +1,334 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}SafeRide NG - Civic Trust & Security{% endblock %}
+
+{% block content %}
+<style>
+  .hero-orb { animation: floatOrb 9s ease-in-out infinite; }
+  .hero-orb-delayed { animation: floatOrbDelayed 11s ease-in-out infinite; }
+  .phone-float { animation: phoneFloat 6s ease-in-out infinite; }
+  .marquee-content { animation: marquee 34s linear infinite; }
+  .scan-line { animation: scanGlow 2.4s ease-in-out infinite; }
+  .reveal { animation: revealUp 700ms ease-out both; }
+  @keyframes floatOrb {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+    50% { transform: translate3d(18px, -18px, 0) scale(1.04); }
+  }
+  @keyframes floatOrbDelayed {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+    50% { transform: translate3d(-16px, 14px, 0) scale(1.06); }
+  }
+  @keyframes phoneFloat {
+    0%, 100% { transform: translateY(0) rotate(-1deg); }
+    50% { transform: translateY(-14px) rotate(1deg); }
+  }
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  @keyframes scanGlow {
+    0%, 100% { opacity: 0.2; transform: translateY(-18px); }
+    50% { opacity: 1; transform: translateY(18px); }
+  }
+  @keyframes revealUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
+  }
+</style>
+
+<div class="relative overflow-hidden">
+  <div class="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(37,99,235,0.12),transparent_34%),radial-gradient(circle_at_85%_20%,rgba(22,163,74,0.10),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(37,99,235,0.08),transparent_32%)]"></div>
+  <div class="absolute left-8 top-32 h-40 w-40 rounded-full bg-primary/10 blur-3xl hero-orb -z-10"></div>
+  <div class="absolute right-10 top-48 h-56 w-56 rounded-full bg-green-500/10 blur-3xl hero-orb-delayed -z-10"></div>
+
+  <section class="max-w-container-max mx-auto px-4 md:px-lg py-14 md:py-24">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+      <div class="reveal">
+        <div class="inline-flex items-center gap-2 rounded-full border border-outline-variant/50 bg-white/85 px-4 py-2 text-xs font-semibold text-on-surface-variant shadow-sm backdrop-blur-md">
+          <span class="material-symbols-outlined text-green-700 text-[18px]">verified_user</span>
+          Civic Trust & Security Portal
+        </div>
+
+        <h1 class="mt-6 text-4xl md:text-5xl lg:text-display-lg font-bold tracking-[-0.04em] leading-[1.05] text-primary text-balance">
+          Scan Before You Enter
+        </h1>
+
+        <p class="mt-5 text-body-lg text-on-surface-variant max-w-[560px] leading-8">
+          Verify commercial vehicles and drivers instantly to stay safe from one-chance crimes and transport-related insecurity.
+        </p>
+
+        <div class="mt-8 flex flex-col sm:flex-row gap-3">
+          <a href="#how-it-works" class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-on-primary font-label-md text-label-md shadow-sm transition hover:bg-primary-container active:scale-95">
+            Verify Vehicle
+            <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+          </a>
+          <a href="{% url 'driver_register' %}" class="inline-flex items-center justify-center rounded-xl bg-surface-container-highest px-6 py-3 text-primary font-label-md text-label-md transition hover:bg-surface-variant active:scale-95">
+            Register Driver
+          </a>
+          <a href="#partner" class="inline-flex items-center justify-center rounded-xl border-2 border-outline-variant px-6 py-3 text-on-surface-variant font-label-md text-label-md transition hover:border-primary hover:text-primary active:scale-95">
+            Partner With Us
+          </a>
+        </div>
+
+        <div class="mt-10 grid grid-cols-3 gap-3 max-w-xl">
+          <div class="rounded-2xl border border-outline-variant/30 bg-white/80 p-4 shadow-sm backdrop-blur-md">
+            <div class="text-2xl font-bold text-primary">QR</div>
+            <div class="mt-1 text-xs text-on-surface-variant">Instant checks</div>
+          </div>
+          <div class="rounded-2xl border border-outline-variant/30 bg-white/80 p-4 shadow-sm backdrop-blur-md">
+            <div class="text-2xl font-bold text-primary">ID</div>
+            <div class="mt-1 text-xs text-on-surface-variant">Driver profile</div>
+          </div>
+          <div class="rounded-2xl border border-outline-variant/30 bg-white/80 p-4 shadow-sm backdrop-blur-md">
+            <div class="text-2xl font-bold text-primary">24/7</div>
+            <div class="mt-1 text-xs text-on-surface-variant">Oversight</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="relative reveal" style="animation-delay: 120ms;">
+        <div class="absolute -inset-6 bg-primary/10 rounded-[2rem] blur-3xl"></div>
+        <div class="relative aspect-[4/3] overflow-hidden rounded-[2rem] border border-outline-variant/30 bg-white shadow-elevated group">
+          <img
+            alt="SafeRide commuter scanning a vehicle QR code"
+            class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZHHD0D5AvlIM4ENip4bge9YH9KrAMilYQcQkk5-0Kc7qTVlMbtUIXv4j-iTNkVvxZDl8K6Frv__ayhpkdG4bW3UttrWeezuyF7IY2Kx8A8ofIVYwTOtRnnx7KdP87WK8ii6Pc-VBTOZ-bqEX3Oz783yxs7ionKYqqFBak9WjE5MCybJ7NNLbULgTTsACVmmEJets4NtgIY-9MARBRpR8diEkMRVYkNYlDOWI5Siie8DHuJJ9M1t4KFOEZjrR-VHUfOtVs2W4DhTw"
+          />
+          <div class="absolute inset-0 bg-gradient-to-t from-primary/70 via-primary/10 to-transparent"></div>
+          <div class="absolute left-6 top-6 right-6 h-px bg-white/40 scan-line"></div>
+          <div class="absolute bottom-5 left-5 right-5 rounded-2xl border border-white/30 bg-surface/90 p-4 shadow-lg backdrop-blur-xl">
+            <div class="flex items-center gap-3">
+              <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-secondary-container text-on-secondary-container">
+                <span class="material-symbols-outlined">check_circle</span>
+              </div>
+              <div>
+                <div class="font-label-md text-label-md text-primary">Vehicle Verified</div>
+                <div class="font-caption text-caption text-on-surface-variant">Toyota Corolla • SMK-123-XY</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-y border-outline-variant/30 bg-surface-container-lowest/60 py-4 backdrop-blur-sm">
+    <div class="max-w-container-max mx-auto px-4 md:px-lg flex items-center">
+      <span class="mr-6 whitespace-nowrap font-label-md text-label-md text-on-surface-variant">Trusted By</span>
+      <div class="marquee w-full overflow-hidden">
+        <div class="marquee-content inline-flex w-max items-center gap-12 text-on-surface-variant font-headline-md opacity-60 grayscale">
+          <span>Rivers State Government</span>
+          <span>NURTW</span>
+          <span>Nigeria Police Force</span>
+          <span>Ministry of Transport</span>
+          <span>Rivers State Government</span>
+          <span>NURTW</span>
+          <span>Nigeria Police Force</span>
+          <span>Ministry of Transport</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="max-w-container-max mx-auto px-4 md:px-lg py-16 md:py-20">
+    <div class="text-center mb-10">
+      <h2 class="font-headline-lg text-headline-lg text-primary">The Crisis in Numbers</h2>
+      <p class="mt-3 text-body-md text-on-surface-variant max-w-2xl mx-auto">SafeRide NG turns uncertainty into verified confidence before every ride.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <div class="reveal rounded-2xl border border-outline-variant/30 bg-white p-6 shadow-soft transition hover:-translate-y-1 hover:shadow-elevated">
+        <span class="material-symbols-outlined text-error text-[32px]">warning</span>
+        <div class="mt-auto pt-5">
+          <div class="font-display-sm text-display-sm text-primary">2,450+</div>
+          <p class="mt-2 font-body-md text-body-md text-on-surface-variant">One-chance incidents reported locally this year.</p>
+        </div>
+      </div>
+      <div class="reveal rounded-2xl border border-outline-variant/30 bg-white p-6 shadow-soft transition hover:-translate-y-1 hover:shadow-elevated" style="animation-delay: 100ms;">
+        <span class="material-symbols-outlined text-primary text-[32px]">policy</span>
+        <div class="mt-auto pt-5">
+          <div class="font-display-sm text-display-sm text-primary">100%</div>
+          <p class="mt-2 font-body-md text-body-md text-on-surface-variant">Database synchronization with National Security.</p>
+        </div>
+      </div>
+      <div class="reveal rounded-2xl border border-primary bg-primary-container p-6 shadow-soft text-on-primary-container transition hover:-translate-y-1 hover:shadow-elevated" style="animation-delay: 200ms;">
+        <span class="material-symbols-outlined text-inverse-primary text-[32px]">security</span>
+        <div class="mt-auto pt-5">
+          <div class="font-display-sm text-display-sm text-on-primary">Zero</div>
+          <p class="mt-2 font-body-md text-body-md text-primary-fixed-dim">Compromised trips when users verify via SafeRide NG.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how-it-works" class="bg-surface-container-lowest py-16 md:py-20">
+    <div class="max-w-container-max mx-auto px-4 md:px-lg">
+      <div class="text-center mb-10">
+        <h2 class="font-headline-lg text-headline-lg text-primary">How It Works</h2>
+        <p class="mt-3 text-body-md text-on-surface-variant max-w-2xl mx-auto">A simple four-step flow designed for commuters, drivers, and authorities.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
+        <div class="reveal rounded-2xl border border-outline-variant/30 bg-white p-6 text-center shadow-soft transition hover:-translate-y-1 hover:shadow-elevated">
+          <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary-fixed text-primary font-headline-md">1</div>
+          <h3 class="font-headline-md text-headline-md text-primary">Scan QR</h3>
+          <p class="mt-2 font-body-md text-body-md text-on-surface-variant">Look for the SafeRide sticker on the vehicle dashboard or window.</p>
+        </div>
+        <div class="reveal rounded-2xl border border-outline-variant/30 bg-white p-6 text-center shadow-soft transition hover:-translate-y-1 hover:shadow-elevated" style="animation-delay: 100ms;">
+          <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary-fixed text-primary font-headline-md">2</div>
+          <h3 class="font-headline-md text-headline-md text-primary">Verify</h3>
+          <p class="mt-2 font-body-md text-body-md text-on-surface-variant">Instantly see the driver profile and vehicle registration status.</p>
+        </div>
+        <div class="reveal rounded-2xl border border-outline-variant/30 bg-white p-6 text-center shadow-soft transition hover:-translate-y-1 hover:shadow-elevated" style="animation-delay: 200ms;">
+          <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary-fixed text-primary font-headline-md">3</div>
+          <h3 class="font-headline-md text-headline-md text-primary">Share</h3>
+          <p class="mt-2 font-body-md text-body-md text-on-surface-variant">Send your live trip status to trusted emergency contacts.</p>
+        </div>
+        <div class="reveal rounded-2xl border border-outline-variant/30 bg-white p-6 text-center shadow-soft transition hover:-translate-y-1 hover:shadow-elevated" style="animation-delay: 300ms;">
+          <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary-fixed text-primary font-headline-md">4</div>
+          <h3 class="font-headline-md text-headline-md text-primary">Ride</h3>
+          <p class="mt-2 font-body-md text-body-md text-on-surface-variant">Travel with peace of mind knowing the vehicle is verified.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="max-w-container-max mx-auto px-4 md:px-lg py-16 md:py-20">
+    <div class="text-center mb-10">
+      <h2 class="font-headline-lg text-headline-lg text-primary">Safety Features</h2>
+      <p class="mt-3 text-body-md text-on-surface-variant max-w-2xl mx-auto">Built for civic trust, transport security, and real-time accountability.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div class="reveal rounded-2xl border border-outline-variant/30 bg-white p-6 shadow-soft transition hover:-translate-y-1 hover:shadow-elevated">
+        <span class="material-symbols-outlined bg-primary-fixed text-primary rounded-xl p-2">fingerprint</span>
+        <h4 class="mt-4 font-label-md text-label-md text-primary">Driver Biometrics</h4>
+        <p class="mt-2 font-body-md text-body-md text-on-surface-variant">Facial and fingerprint verification.</p>
+      </div>
+      <div class="reveal rounded-2xl border border-outline-variant/30 bg-white p-6 shadow-soft transition hover:-translate-y-1 hover:shadow-elevated" style="animation-delay: 80ms;">
+        <span class="material-symbols-outlined bg-primary-fixed text-primary rounded-xl p-2">my_location</span>
+        <h4 class="mt-4 font-label-md text-label-md text-primary">Live GPS Tracking</h4>
+        <p class="mt-2 font-body-md text-body-md text-on-surface-variant">Real-time monitoring for every trip.</p>
+      </div>
+      <div class="reveal rounded-2xl border border-outline-variant/30 bg-white p-6 shadow-soft transition hover:-translate-y-1 hover:shadow-elevated" style="animation-delay: 160ms;">
+        <span class="material-symbols-outlined bg-error-container text-error rounded-xl p-2">sos</span>
+        <h4 class="mt-4 font-label-md text-label-md text-primary">Emergency SOS</h4>
+        <p class="mt-2 font-body-md text-body-md text-on-surface-variant">One-tap alert to security agencies.</p>
+      </div>
+      <div class="reveal rounded-2xl border border-outline-variant/30 bg-white p-6 shadow-soft transition hover:-translate-y-1 hover:shadow-elevated" style="animation-delay: 240ms;">
+        <span class="material-symbols-outlined bg-primary-fixed text-primary rounded-xl p-2">qr_code_scanner</span>
+        <h4 class="mt-4 font-label-md text-label-md text-primary">QR Authentication</h4>
+        <p class="mt-2 font-body-md text-body-md text-on-surface-variant">Tamper-proof encryption on every vehicle.</p>
+      </div>
+      <div class="reveal rounded-2xl border border-outline-variant/30 bg-white p-6 shadow-soft transition hover:-translate-y-1 hover:shadow-elevated" style="animation-delay: 320ms;">
+        <span class="material-symbols-outlined bg-primary-fixed text-primary rounded-xl p-2">route</span>
+        <h4 class="mt-4 font-label-md text-label-md text-primary">Route Monitoring</h4>
+        <p class="mt-2 font-body-md text-body-md text-on-surface-variant">Automatic flagging of off-route deviations.</p>
+      </div>
+      <div class="reveal rounded-2xl border border-outline-variant/30 bg-white p-6 shadow-soft transition hover:-translate-y-1 hover:shadow-elevated" style="animation-delay: 400ms;">
+        <span class="material-symbols-outlined bg-primary-fixed text-primary rounded-xl p-2">support_agent</span>
+        <h4 class="mt-4 font-label-md text-label-md text-primary">24/7 Command Center</h4>
+        <p class="mt-2 font-body-md text-body-md text-on-surface-variant">Professional security dispatchers on standby.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="verification-demo" class="max-w-container-max mx-auto px-4 md:px-lg py-16 md:py-20">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+      <div class="phone-float flex justify-center">
+        <div class="relative h-[600px] w-[300px] overflow-hidden rounded-[40px] border-8 border-surface-variant bg-surface shadow-2xl">
+          <div class="flex h-6 w-full items-center justify-between px-4 text-[10px] text-on-surface-variant">
+            <span>9:41</span>
+            <div class="flex gap-1">
+              <span class="material-symbols-outlined text-[12px]">signal_cellular_alt</span>
+              <span class="material-symbols-outlined text-[12px]">wifi</span>
+              <span class="material-symbols-outlined text-[12px]">battery_full</span>
+            </div>
+          </div>
+
+          <div class="flex h-full flex-col gap-4 p-6">
+            <div class="flex items-center justify-between">
+              <span class="material-symbols-outlined text-on-surface">arrow_back</span>
+              <span class="font-label-md text-label-md text-primary">Verification Details</span>
+              <span class="material-symbols-outlined text-on-surface">more_vert</span>
+            </div>
+
+            <div class="mt-4 flex flex-col items-center text-center">
+              <div class="mb-3 h-24 w-24 overflow-hidden rounded-full border-4 border-secondary-container bg-surface-variant">
+                <img
+                  alt="Driver profile"
+                  class="h-full w-full object-cover"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCsk-M1C5A_28mhj6ygSAihd2cpwJ8s7uCYUFFIq4Bhq11zZwO-MsQPVgW2ar4sMe-_ysMt7kWtEJr20YYcGCyL5MRYJFYaIm7q845EOqAc95cHI-_I-DtKWwpaQkpuGyqwO2I7F4Usuf0G8H84QmWyaWUP2J2-rlpQPHwSvo-TIRIAkgKJJ1Ef-8lS6GiCFBgNaIYq7ZfhbJP1Ju_SddWh1imogQN4KpRG4yoOVWZZmeieEunf06e1PHAuPkHzw2LiT6J4BrOt5c8"
+                />
+              </div>
+              <div class="mb-2 flex items-center gap-1 text-green-700">
+                <span class="material-symbols-outlined text-[16px]">verified</span>
+                <span class="font-label-md text-label-md">Verified Driver</span>
+              </div>
+              <h3 class="font-headline-md text-headline-md text-primary">Oluwaseun Adeyemi</h3>
+              <p class="font-caption text-caption text-on-surface-variant">ID: SR-NG-8842</p>
+            </div>
+
+            <div class="rounded-xl border border-outline-variant/30 bg-surface-container-low p-4">
+              <div class="mb-3 flex justify-between">
+                <span class="font-caption text-caption text-on-surface-variant">Vehicle</span>
+                <span class="font-label-md text-label-md text-on-surface">Toyota Corolla (Yellow)</span>
+              </div>
+              <div class="mb-3 flex justify-between">
+                <span class="font-caption text-caption text-on-surface-variant">Plate Number</span>
+                <span class="font-label-md text-label-md text-on-surface">SMK-123-XY</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="font-caption text-caption text-on-surface-variant">Fleet</span>
+                <span class="font-label-md text-label-md text-on-surface">NURTW Lagos Island</span>
+              </div>
+            </div>
+
+            <button class="mt-auto w-full rounded-full bg-primary px-4 py-3 font-label-md text-label-md text-on-primary transition hover:bg-primary-container active:scale-95">
+              Share Trip Status
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="reveal">
+        <div class="inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2 text-xs font-semibold text-primary">
+          <span class="material-symbols-outlined text-[16px]">qr_code_scanner</span>
+          Live Verification Demo
+        </div>
+        <h2 class="mt-5 font-display-sm text-display-sm text-primary">Immediate Trust. Peace of Mind.</h2>
+        <p class="mt-4 text-body-lg leading-8 text-on-surface-variant">
+          When you scan a SafeRide QR code, you instantly receive the driver's verified profile on your device. The immediate trust passengers feel comes from knowing that every detail is synchronized with National Security databases. If a vehicle isn't registered, you'll know before you even open the door.
+        </p>
+        <div class="mt-8 grid grid-cols-2 gap-3">
+          <div class="rounded-2xl border border-outline-variant/30 bg-white p-4 shadow-sm">
+            <div class="text-2xl font-bold text-primary">3s</div>
+            <div class="mt-1 text-xs text-on-surface-variant">Average verification time</div>
+          </div>
+          <div class="rounded-2xl border border-outline-variant/30 bg-white p-4 shadow-sm">
+            <div class="text-2xl font-bold text-primary">1 QR</div>
+            <div class="mt-1 text-xs text-on-surface-variant">Per approved vehicle</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="partner" class="w-full bg-primary-container py-16 md:py-20">
+    <div class="max-w-container-max mx-auto px-4 md:px-lg flex flex-col md:flex-row items-center justify-between gap-8">
+      <div class="max-w-[640px]">
+        <h2 class="font-display-sm text-display-sm text-on-primary">Protect Your Citizens & Fleet</h2>
+        <p class="mt-4 text-body-lg leading-8 text-primary-fixed-dim">
+          Join the national effort to eliminate transport insecurity. Partner with SafeRide NG to secure your state's transport infrastructure or register your commercial fleet today.
+        </p>
+      </div>
+      <a href="{% url 'driver_register' %}" class="whitespace-nowrap rounded-xl bg-primary-fixed px-7 py-4 font-label-md text-label-md text-on-primary-fixed shadow-lg transition hover:bg-inverse-primary active:scale-95">
+        Register Your Fleet
+      </a>
+    </div>
+  </section>
+</div>
+{% endblock %}

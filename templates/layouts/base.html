@@ -1,0 +1,223 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}SafeRide NG{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
+    <script id="tailwind-config">
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+            },
+            colors: {
+              primary: "#2563EB",
+              "primary-container": "#003366",
+              "primary-fixed": "#d5e3ff",
+              "primary-fixed-dim": "#a7c8ff",
+              secondary: "#1b6d24",
+              "secondary-container": "#a0f399",
+              tertiary: "#460003",
+              error: "#DC2626",
+              "error-container": "#ffdad6",
+              background: "#fcf9f8",
+              surface: "#fcf9f8",
+              "surface-bright": "#fcf9f8",
+              "surface-dim": "#dcd9d9",
+              "surface-container-lowest": "#ffffff",
+              "surface-container-low": "#f6f3f2",
+              "surface-container": "#f0edec",
+              "surface-container-high": "#ebe7e7",
+              "surface-container-highest": "#e5e2e1",
+              "surface-variant": "#e5e2e1",
+              "on-primary": "#ffffff",
+              "on-primary-container": "#799dd6",
+              "on-primary-fixed": "#001b3c",
+              "on-primary-fixed-variant": "#1f477b",
+              "on-secondary": "#ffffff",
+              "on-secondary-container": "#217128",
+              "on-tertiary": "#ffffff",
+              "on-tertiary-container": "#ff6d63",
+              "on-error": "#ffffff",
+              "on-error-container": "#93000a",
+              "on-background": "#1c1b1b",
+              "on-surface": "#1c1b1b",
+              "on-surface-variant": "#43474f",
+              outline: "#737780",
+              "outline-variant": "#c3c6d1",
+              inverse: "#313030",
+            },
+            fontSize: {
+              "display-lg": ["48px", { lineHeight: "60px", letterSpacing: "-0.02em" }],
+              "display-sm": ["36px", { lineHeight: "44px", letterSpacing: "-0.02em" }],
+              "headline-lg": ["30px", { lineHeight: "38px" }],
+              "headline-md": ["24px", { lineHeight: "32px" }],
+              "body-lg": ["18px", { lineHeight: "28px" }],
+              "body-md": ["16px", { lineHeight: "24px" }],
+              "label-md": ["14px", { lineHeight: "20px", letterSpacing: "0.01em" }],
+              caption: ["12px", { lineHeight: "16px" }],
+            },
+            spacing: {
+              xs: "4px",
+              sm: "8px",
+              md: "16px",
+              lg: "24px",
+              xl: "32px",
+              xxl: "48px",
+              "3xl": "64px",
+              "container-max": "1280px",
+            },
+            boxShadow: {
+              soft: "0 4px 20px rgba(0, 51, 102, 0.08)",
+              elevated: "0 10px 30px rgba(0, 51, 102, 0.12)",
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      body { background-color: #fcf9f8; color: #1c1b1b; }
+      .bg-grid-pattern {
+        background-image:
+          linear-gradient(to right, rgba(37, 99, 235, 0.06) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(37, 99, 235, 0.06) 1px, transparent 1px);
+        background-size: 32px 32px;
+      }
+      .glass {
+        background: rgba(255, 255, 255, 0.78);
+        backdrop-filter: blur(16px);
+      }
+      input:not([type="checkbox"]), select, textarea {
+        width: 100%;
+        border: 1px solid #c3c6d1;
+        border-radius: 12px;
+        background: #ffffff;
+        padding: 12px 14px;
+        color: #1c1b1b;
+        outline: none;
+        transition: border-color 160ms ease, box-shadow 160ms ease;
+      }
+      input:not([type="checkbox"]):focus, select:focus, textarea:focus {
+        border-color: #2563EB;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.10);
+      }
+      .fade-in { animation: fadeIn 180ms ease-out; }
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(4px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+    </style>
+  </head>
+
+  <body class="min-h-screen bg-background text-on-surface antialiased font-sans">
+    <div class="min-h-screen flex flex-col">
+      <header class="sticky top-0 z-50 glass border-b border-outline-variant/40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex items-center justify-between gap-4 py-4">
+            <a href="{% url 'home' %}" class="flex items-center gap-3 group">
+              <div class="w-10 h-10 rounded-2xl bg-[#2563EB] text-white flex items-center justify-center font-bold shadow-sm group-hover:shadow-md transition">
+                SR
+              </div>
+              <div>
+                <div class="font-bold text-primary leading-tight">SafeRide NG</div>
+                <div class="text-xs text-on-surface-variant leading-tight">Civic verification platform</div>
+              </div>
+            </a>
+
+            <nav class="hidden lg:flex items-center gap-1 text-sm">
+              <a href="{% url 'home' %}" class="px-3 py-2 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition">Home</a>
+              {% if user.is_authenticated %}
+                {% if user.role == "driver" %}
+                  <a href="{% url 'driver_profile' %}" class="px-3 py-2 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition">Driver Profile</a>
+                  <a href="{% url 'driver_vehicle_list' %}" class="px-3 py-2 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition">Vehicles</a>
+                  <a href="{% url 'my_trips' %}" class="px-3 py-2 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition">My Trips</a>
+                  <a href="{% url 'emergency_contact_list' %}" class="px-3 py-2 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition">Emergency Contacts</a>
+                {% else %}
+                  <a href="{% url 'dashboard_home' %}" class="px-3 py-2 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition">Dashboard</a>
+                  <a href="{% url 'admin_vehicle_dashboard' %}" class="px-3 py-2 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition">Vehicles</a>
+                  <a href="{% url 'emergency_dashboard' %}" class="px-3 py-2 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition">Emergency</a>
+                  <a href="{% url 'report_dashboard' %}" class="px-3 py-2 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition">Reports</a>
+                {% endif %}
+                <form method="post" action="{% url 'logout' %}" class="inline">
+                  {% csrf_token %}
+                  <button type="submit" class="ml-2 px-3 py-2 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition">Logout</button>
+                </form>
+              {% else %}
+                <a href="{% url 'login' %}" class="px-3 py-2 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition">Login</a>
+                <a href="{% url 'register' %}" class="ml-2 px-3 py-2 rounded-xl bg-[#2563EB] text-white font-semibold hover:bg-[#1d4ed8] transition active:scale-[0.98]">Register</a>
+              {% endif %}
+            </nav>
+
+            <details class="lg:hidden relative">
+              <summary class="list-none cursor-pointer rounded-xl border border-outline-variant/40 px-3 py-2 text-sm font-semibold text-primary bg-surface-container-lowest">Menu</summary>
+              <div class="absolute right-0 mt-2 w-56 rounded-2xl border border-outline-variant/40 bg-white shadow-elevated p-2">
+                <a href="{% url 'home' %}" class="block rounded-xl px-3 py-2 text-sm text-on-surface hover:bg-surface-container-low">Home</a>
+                {% if user.is_authenticated %}
+                  {% if user.role == "driver" %}
+                    <a href="{% url 'driver_profile' %}" class="block rounded-xl px-3 py-2 text-sm text-on-surface hover:bg-surface-container-low">Driver Profile</a>
+                    <a href="{% url 'driver_vehicle_list' %}" class="block rounded-xl px-3 py-2 text-sm text-on-surface hover:bg-surface-container-low">Vehicles</a>
+                    <a href="{% url 'my_trips' %}" class="block rounded-xl px-3 py-2 text-sm text-on-surface hover:bg-surface-container-low">My Trips</a>
+                    <a href="{% url 'emergency_contact_list' %}" class="block rounded-xl px-3 py-2 text-sm text-on-surface hover:bg-surface-container-low">Emergency Contacts</a>
+                  {% else %}
+                    <a href="{% url 'dashboard_home' %}" class="block rounded-xl px-3 py-2 text-sm text-on-surface hover:bg-surface-container-low">Dashboard</a>
+                    <a href="{% url 'admin_vehicle_dashboard' %}" class="block rounded-xl px-3 py-2 text-sm text-on-surface hover:bg-surface-container-low">Vehicles</a>
+                    <a href="{% url 'emergency_dashboard' %}" class="block rounded-xl px-3 py-2 text-sm text-on-surface hover:bg-surface-container-low">Emergency</a>
+                    <a href="{% url 'report_dashboard' %}" class="block rounded-xl px-3 py-2 text-sm text-on-surface hover:bg-surface-container-low">Reports</a>
+                  {% endif %}
+                  <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="w-full rounded-xl px-3 py-2 text-left text-sm text-on-surface hover:bg-surface-container-low">Logout</button>
+                  </form>
+                {% else %}
+                  <a href="{% url 'login' %}" class="block rounded-xl px-3 py-2 text-sm text-on-surface hover:bg-surface-container-low">Login</a>
+                  <a href="{% url 'register' %}" class="block rounded-xl px-3 py-2 text-sm text-primary font-semibold hover:bg-surface-container-low">Register</a>
+                {% endif %}
+              </div>
+            </details>
+          </div>
+        </div>
+      </header>
+
+      <main class="flex-1 bg-grid-pattern">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10">
+          {% if messages %}
+            <div class="space-y-2 mb-6">
+              {% for message in messages %}
+                <div class="p-3 rounded-xl text-sm border shadow-sm fade-in
+                  {% if message.tags == 'success' %}
+                    bg-green-50 text-green-800 border-green-200
+                  {% elif message.tags == 'error' %}
+                    bg-red-50 text-red-800 border-red-200
+                  {% elif message.tags == 'warning' %}
+                    bg-amber-50 text-amber-800 border-amber-200
+                  {% else %}
+                    bg-blue-50 text-blue-800 border-blue-200
+                  {% endif %}">
+                  {{ message }}
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+          {% block content %}{% endblock %}
+        </div>
+      </main>
+
+      <footer class="border-t border-outline-variant/40 bg-white/80 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-xs text-on-surface-variant flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div>© {% now "Y" %} SafeRide NG. Secure civic verification infrastructure.</div>
+          <div class="flex items-center gap-4">
+            <a href="{% url 'home' %}" class="hover:text-primary transition">Home</a>
+            <a href="{% url 'login' %}" class="hover:text-primary transition">Login</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

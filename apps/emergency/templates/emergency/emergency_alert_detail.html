@@ -1,0 +1,69 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Emergency Alert Detail • SafeRide NG{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+  {% include "partials/page_header.html" with title="Emergency Alert Detail" subtitle="Review trip, vehicle, driver, passenger, and alert details." %}
+
+  <div class="mb-6 flex flex-col sm:flex-row gap-3">
+    <a href="{% url 'emergency_dashboard' %}" class="inline-flex items-center justify-center rounded-xl border border-outline-variant/60 bg-white px-5 py-3 text-primary font-semibold hover:bg-surface-container-low transition">Back to Dashboard</a>
+    {% if alert.status == 'active' %}
+      <form method="post" action="{% url 'emergency_alert_resolve' alert.uuid %}">
+        {% csrf_token %}
+        <button type="submit" class="inline-flex items-center justify-center rounded-xl bg-green-600 px-5 py-3 text-white font-semibold hover:bg-green-700 transition active:scale-[0.98]">Resolve Alert</button>
+      </form>
+    {% endif %}
+  </div>
+
+  <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+    <div class="rounded-[2rem] border border-outline-variant/40 bg-white p-6 shadow-soft">
+      <div class="text-xs font-semibold uppercase tracking-[0.04em] text-on-surface-variant mb-5">Alert Details</div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {% include "partials/info_tile.html" with label="Alert ID" value=alert.uuid wrapper_class="" %}
+        {% include "partials/info_tile.html" with label="Status" value=alert.get_status_display wrapper_class="" %}
+        {% include "partials/info_tile.html" with label="Alert Type" value=alert.get_alert_type_display wrapper_class="" %}
+        {% include "partials/info_tile.html" with label="Created" value=alert.created_at|date:"M d, Y h:i A" wrapper_class="" %}
+        {% include "partials/info_tile.html" with label="Resolved" value=alert.resolved_at|date:"M d, Y h:i A"|default:"Not resolved" wrapper_class="md:col-span-2" %}
+      </div>
+      {% if alert.message %}
+        <div class="mt-5 rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-5">
+          <div class="text-xs font-semibold uppercase tracking-[0.04em] text-on-surface-variant mb-2">Message</div>
+          <div class="text-sm text-on-surface whitespace-pre-line">{{ alert.message }}</div>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="rounded-[2rem] border border-outline-variant/40 bg-white p-6 shadow-soft">
+      <div class="text-xs font-semibold uppercase tracking-[0.04em] text-on-surface-variant mb-5">Trip Details</div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {% include "partials/info_tile.html" with label="Passenger" value=alert.trip.passenger_name wrapper_class="" %}
+        {% include "partials/info_tile.html" with label="Phone" value=alert.trip.passenger_phone wrapper_class="" %}
+        {% include "partials/info_tile.html" with label="Destination" value=alert.trip.destination wrapper_class="" %}
+        {% include "partials/info_tile.html" with label="Start Location" value=alert.trip.start_location wrapper_class="" %}
+        {% include "partials/info_tile.html" with label="Trip Status" value=alert.trip.get_trip_status_display wrapper_class="" %}
+        {% include "partials/info_tile.html" with label="Started" value=alert.trip.started_at|date:"M d, Y h:i A" wrapper_class="" %}
+      </div>
+    </div>
+
+    <div class="space-y-6">
+      <div class="rounded-[2rem] border border-outline-variant/40 bg-white p-6 shadow-soft">
+        <div class="text-xs font-semibold uppercase tracking-[0.04em] text-on-surface-variant mb-5">Driver Details</div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {% include "partials/info_tile.html" with label="Name" value=alert.trip.driver.full_name wrapper_class="" %}
+          {% include "partials/info_tile.html" with label="Email" value=alert.trip.driver.email wrapper_class="" %}
+        </div>
+      </div>
+      <div class="rounded-[2rem] border border-outline-variant/40 bg-white p-6 shadow-soft">
+        <div class="text-xs font-semibold uppercase tracking-[0.04em] text-on-surface-variant mb-5">Vehicle Details</div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {% include "partials/info_tile.html" with label="Plate Number" value=alert.trip.vehicle.plate_number wrapper_class="" %}
+          {% include "partials/info_tile.html" with label="Type" value=alert.trip.vehicle.get_vehicle_type_display wrapper_class="" %}
+          {% include "partials/info_tile.html" with label="Make" value=alert.trip.vehicle.vehicle_make wrapper_class="" %}
+          {% include "partials/info_tile.html" with label="Model" value=alert.trip.vehicle.vehicle_model wrapper_class="" %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

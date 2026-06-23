@@ -1,0 +1,107 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Dashboard • SafeRide NG{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+  {% include "partials/page_header.html" with title="Admin Dashboard" subtitle="Driver approval and verification statistics for SafeRide NG." %}
+
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+    <div class="rounded-[1.5rem] border border-outline-variant/40 bg-white p-5 shadow-soft">
+      <div class="flex items-center justify-between">
+        <div class="text-xs font-semibold uppercase tracking-[0.04em] text-on-surface-variant">Total Drivers</div>
+        <span class="material-symbols-outlined text-primary">badge</span>
+      </div>
+      <div class="text-3xl font-bold text-primary mt-4">{{ stats.total_drivers }}</div>
+    </div>
+    <div class="rounded-[1.5rem] border border-outline-variant/40 bg-white p-5 shadow-soft">
+      <div class="flex items-center justify-between">
+        <div class="text-xs font-semibold uppercase tracking-[0.04em] text-on-surface-variant">Pending</div>
+        <span class="material-symbols-outlined text-primary">pending_actions</span>
+      </div>
+      <div class="text-3xl font-bold text-primary mt-4">{{ stats.pending }}</div>
+    </div>
+    <div class="rounded-[1.5rem] border border-outline-variant/40 bg-white p-5 shadow-soft">
+      <div class="flex items-center justify-between">
+        <div class="text-xs font-semibold uppercase tracking-[0.04em] text-on-surface-variant">Verified</div>
+        <span class="material-symbols-outlined text-green-700">verified</span>
+      </div>
+      <div class="text-3xl font-bold text-green-700 mt-4">{{ stats.verified }}</div>
+    </div>
+    <div class="rounded-[1.5rem] border border-outline-variant/40 bg-white p-5 shadow-soft">
+      <div class="flex items-center justify-between">
+        <div class="text-xs font-semibold uppercase tracking-[0.04em] text-on-surface-variant">Flagged</div>
+        <span class="material-symbols-outlined text-red-700">warning</span>
+      </div>
+      <div class="text-3xl font-bold text-red-700 mt-4">{{ stats.flagged }}</div>
+    </div>
+  </div>
+
+  <div class="rounded-[2rem] border border-outline-variant/40 bg-white shadow-soft overflow-hidden">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-6 border-b border-outline-variant/30">
+      <div>
+        <h2 class="text-lg font-semibold text-primary">Pending Driver Approvals</h2>
+        <p class="text-sm text-on-surface-variant mt-1">Review and approve verified profiles or flag suspicious entries.</p>
+      </div>
+      <a href="{% url 'driver_profile' %}" class="inline-flex items-center justify-center rounded-xl border border-outline-variant/60 bg-white px-4 py-2 text-primary font-semibold hover:bg-surface-container-low transition">My Profile</a>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-sm">
+        <thead class="text-left bg-surface-container-low text-on-surface-variant">
+          <tr>
+            <th class="py-4 px-5 font-semibold">Driver</th>
+            <th class="py-4 px-5 font-semibold">License</th>
+            <th class="py-4 px-5 font-semibold">Vehicle</th>
+            <th class="py-4 px-5 font-semibold">Submitted</th>
+            <th class="py-4 px-5 font-semibold">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-outline-variant/30">
+          {% if pending_drivers %}
+            {% for p in pending_drivers %}
+              <tr class="hover:bg-surface-container-low/70 transition">
+                <td class="py-4 px-5">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-[#2563EB] text-white flex items-center justify-center font-bold">
+                      {{ p.user.first_name|slice:":1" }}{{ p.user.last_name|slice:":1" }}
+                    </div>
+                    <div>
+                      <div class="font-semibold text-on-surface">{{ p.user.full_name }}</div>
+                      <div class="text-xs text-on-surface-variant">{{ p.user.email }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="py-4 px-5 text-on-surface">{{ p.license_number|default:"—" }}</td>
+                <td class="py-4 px-5">
+                  <div class="text-on-surface">{{ p.vehicle_make|default:"—" }} {{ p.vehicle_model|default:"" }}</div>
+                  <div class="text-xs text-on-surface-variant">Plate: {{ p.vehicle_plate_number|default:"—" }}</div>
+                </td>
+                <td class="py-4 px-5 text-on-surface-variant">{{ p.created_at|date:"Y-m-d" }}</td>
+                <td class="py-4 px-5">
+                  <div class="flex flex-wrap gap-2">
+                    <form method="post" action="{% url 'driver_approval' p.pk %}">
+                      {% csrf_token %}
+                      <input type="hidden" name="action" value="approve" />
+                      <button type="submit" class="inline-flex items-center justify-center rounded-xl bg-green-600 px-3 py-2 text-white font-semibold hover:bg-green-700 transition active:scale-[0.98]">Approve</button>
+                    </form>
+                    <form method="post" action="{% url 'driver_approval' p.pk %}">
+                      {% csrf_token %}
+                      <input type="hidden" name="action" value="flag" />
+                      <button type="submit" class="inline-flex items-center justify-center rounded-xl bg-red-600 px-3 py-2 text-white font-semibold hover:bg-red-700 transition active:scale-[0.98]">Flag</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td class="py-8 text-center text-on-surface-variant" colspan="5">No pending driver approvals right now.</td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

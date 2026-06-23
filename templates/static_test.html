@@ -1,0 +1,26 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Static Test - SafeRide NG{% endblock %}
+
+{% block content %}
+  <div class="py-12">
+    <h1 class="text-2xl font-bold text-primary mb-4">Static files rendering test</h1>
+    <p class="text-sm text-on-surface-variant mb-6">
+      If this image loads, Django static serving is configured correctly.
+    </p>
+
+    <div class="rounded-2xl border border-outline-variant/30 p-6 bg-surface-container-lowest">
+      <div class="text-sm font-semibold text-on-surface-variant mb-3">Logo from /static/logo.svg</div>
+      <img
+        alt="SafeRide logo"
+        class="w-32 h-32"
+        src="{% static 'logo.svg' %}"
+      />
+
+      <div class="mt-4 text-xs text-on-surface-variant">
+        Expected path: <code>static/logo.svg</code>
+      </div>
+    </div>
+  </div>
+{% endblock %}

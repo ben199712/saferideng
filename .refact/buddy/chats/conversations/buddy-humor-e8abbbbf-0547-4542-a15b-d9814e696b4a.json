@@ -1,0 +1,39 @@
+{
+  "id": "buddy-humor-e8abbbbf-0547-4542-a15b-d9814e696b4a",
+  "title": "Humor for AgentsMdGapDetected",
+  "model": "google_gemini/gemini-2.5-flash",
+  "mode": "buddy",
+  "tool_use": "none",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Generate 3 short, friendly, situational one-liners about: AgentsMdGapDetected in a software project.\nReal state: tasks:0 stuck:0, traj:0, mem:0, mcp:0 failing:0, providers_ok:true. Keep each under 80 chars. No jargon. No fake events.\nOutput as a JSON array of 3 strings."
+    },
+    {
+      "message_id": "8f631403-6753-46ca-ad1e-dde411edf5f1",
+      "role": "assistant",
+      "content": "```json\n[\n  \"Looks like we found",
+      "finish_reason": "length",
+      "usage": {
+        "prompt_tokens": 82,
+        "completion_tokens": 11,
+        "total_tokens": 93
+      }
+    }
+  ],
+  "created_at": "2026-05-31T06:30:05.056596700+00:00",
+  "boost_reasoning": false,
+  "checkpoints_enabled": true,
+  "context_tokens_cap": null,
+  "include_project_info": true,
+  "isTitleGenerated": false,
+  "auto_approve_editing_tools": false,
+  "auto_approve_dangerous_commands": false,
+  "buddy_meta": {
+    "is_buddy_chat": true,
+    "buddy_chat_kind": "system",
+    "workflow_id": "buddy_humor"
+  },
+  "root_chat_id": "buddy-humor-e8abbbbf-0547-4542-a15b-d9814e696b4a",
+  "updated_at": "2026-05-31T06:30:05.057757600+00:00"
+}

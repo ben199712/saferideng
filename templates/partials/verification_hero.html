@@ -1,0 +1,15 @@
+<div class="text-center fade-in">
+  {% if tone == 'green' %}
+    <div class="w-20 h-20 rounded-full bg-green-50 text-green-700 flex items-center justify-center mx-auto shadow-sm">
+  {% elif tone == 'red' %}
+    <div class="w-20 h-20 rounded-full bg-red-50 text-red-700 flex items-center justify-center mx-auto shadow-sm">
+  {% elif tone == 'amber' %}
+    <div class="w-20 h-20 rounded-full bg-amber-50 text-amber-700 flex items-center justify-center mx-auto shadow-sm">
+  {% else %}
+    <div class="w-20 h-20 rounded-full bg-blue-50 text-primary flex items-center justify-center mx-auto shadow-sm">
+  {% endif %}
+    <span class="material-symbols-outlined text-5xl">{{ icon }}</span>
+  </div>
+  <h1 class="mt-6 text-3xl md:text-4xl font-bold text-primary tracking-[-0.02em]">{{ title }}</h1>
+  <p class="text-sm md:text-base text-on-surface-variant max-w-2xl mx-auto mt-3">{{ description }}</p>
+</div>

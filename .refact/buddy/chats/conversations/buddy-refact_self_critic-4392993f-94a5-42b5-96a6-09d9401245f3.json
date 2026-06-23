@@ -1,0 +1,102 @@
+{
+  "id": "buddy-refact_self_critic-4392993f-94a5-42b5-96a6-09d9401245f3",
+  "title": "Refact Self-Critic",
+  "model": "google_gemini/gemini-2.5-flash",
+  "mode": "buddy",
+  "tool_use": "refact_engine_clone,refact_engine_cat,refact_engine_search,search_pattern,buddy_memory_create,buddy_runtime_event,buddy_speak",
+  "messages": [
+    {
+      "role": "system",
+      "content": "%BUDDY_PERSONALITY%\n\nYou are running a self-critique pass on Refact itself. Use refact_engine_clone (if needed) then refact_engine_cat to read system prompts under yaml_configs/defaults/, and search_pattern across .refact/trajectories/ for failure patterns.\n1. Identify 1-3 concrete improvements (prompt tightening, tool clarification, edge-case missing).\n2. Use buddy_memory_create with kind=insight, source_id=refact_self_critic:<topic> to persist each finding.\n3. Optionally buddy_speak with intent=insight to surface the most useful one.\n4. End with buddy_runtime_event summarizing what you noticed.\n"
+    },
+    {
+      "role": "user",
+      "content": "Recent trajectories root: .refact/trajectories/\nEngine source mirror: clone via refact_engine_clone first if needed\nWorkflow: refact_self_critic\n"
+    },
+    {
+      "message_id": "3c49cd83-af22-4fe1-84b9-2fe165f3238c",
+      "role": "assistant",
+      "content": "",
+      "finish_reason": "tool_calls",
+      "tool_calls": [
+        {
+          "id": "function-call-11039317049774932867",
+          "index": 0,
+          "function": {
+            "arguments": "{}",
+            "name": "refact_engine_clone"
+          },
+          "type": "function"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1116,
+        "completion_tokens": 13,
+        "total_tokens": 1129
+      }
+    },
+    {
+      "message_id": "2200b0a8-cac2-4e60-b1c0-8ae20afaf74f",
+      "role": "tool",
+      "content": "Error: failed to clone refact engine mirror: unrecoverable internal error: 'writer.open == 0'",
+      "tool_call_id": "function-call-11039317049774932867",
+      "tool_failed": true
+    },
+    {
+      "message_id": "88579a61-65cc-41fc-b2db-303724c0633f",
+      "role": "assistant",
+      "content": "",
+      "finish_reason": "tool_calls",
+      "tool_calls": [
+        {
+          "id": "function-call-933545882041764330",
+          "index": 0,
+          "function": {
+            "arguments": "{\"status\":\"failed\",\"description\":\"Failed to clone the Refact engine mirror, preventing self-critique pass. The error message was \\\"Error: failed to clone refact engine mirror: unrecoverable internal error: 'writer.open == 0'\\\".\",\"title\":\"Refact Self-Critique Failed: Engine Mirror Clone Error\"}",
+            "name": "buddy_runtime_event"
+          },
+          "type": "function"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1171,
+        "completion_tokens": 83,
+        "total_tokens": 1254
+      }
+    },
+    {
+      "message_id": "285ebfc8-416a-45f4-ab38-20cd40ffecc3",
+      "role": "tool",
+      "content": "Runtime event enqueued: Refact Self-Critique Failed: Engine Mirror Clone Error",
+      "tool_call_id": "function-call-933545882041764330",
+      "tool_failed": false
+    },
+    {
+      "message_id": "b53a8ebc-5713-4f7f-877a-67c005d63a97",
+      "role": "assistant",
+      "content": "I was unable to clone the Refact engine mirror, which is necessary for the self-critique process. The error message was \"Error: failed to clone refact engine mirror: unrecoverable internal error: 'writer.open == 0'\". I've reported this as a failed runtime event.",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 1288,
+        "completion_tokens": 62,
+        "total_tokens": 1350
+      }
+    }
+  ],
+  "created_at": "2026-06-18T03:35:23.357315100+00:00",
+  "boost_reasoning": false,
+  "checkpoints_enabled": true,
+  "context_tokens_cap": null,
+  "include_project_info": true,
+  "isTitleGenerated": false,
+  "auto_approve_editing_tools": false,
+  "auto_approve_dangerous_commands": false,
+  "autonomous_no_confirm": true,
+  "buddy_meta": {
+    "is_buddy_chat": true,
+    "buddy_chat_kind": "system",
+    "workflow_id": "refact_self_critic"
+  },
+  "root_chat_id": "buddy-refact_self_critic-4392993f-94a5-42b5-96a6-09d9401245f3",
+  "updated_at": "2026-06-18T03:35:23.360840+00:00"
+}

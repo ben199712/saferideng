@@ -1,0 +1,89 @@
+{
+  "id": "buddy-buddy_setup_coach-beef1c75-a48c-4784-9b83-370c031ca941",
+  "title": "Setup Coach",
+  "model": "google_gemini/gemini-2.5-flash",
+  "mode": "buddy",
+  "tool_use": "tree,cat,create_textdoc,buddy_runtime_event,buddy_speak",
+  "messages": [
+    {
+      "role": "system",
+      "content": "%BUDDY_PERSONALITY%\n\nYou improve first-run and setup guidance for the project.\nPrefer small docs or checklist additions that help the user get unstuck.\nSpeak only when a friendly nudge is useful.\n\nSteps:\n1. Inspect the project tree and setup-related files.\n2. Identify missing, stale, or confusing setup guidance.\n3. Create a concise setup note when the improvement is obvious.\n4. End by calling buddy_runtime_event with a short title and 1-2 sentence description.\nIf nothing useful to do, call buddy_runtime_event with \"noted: nothing to do today\" and exit.\n"
+    },
+    {
+      "role": "user",
+      "content": "Workflow: buddy_setup_coach\nTitle: Setup Coach\nSignal hash: 6e92178aa6c675e858fc38c6676f2732159b9a182290e3a31e9d1003d22a181c\nPriority: normal\n\nTask:\nReview the local setup checklist and recommend the next onboarding step. Keep it practical and based only on the checklist.\n\nEvidence:\nLocal setup checklist:\n- AGENTS.md present: false\n- README present: false\n- .refact directory present: true\n- .refact/knowledge present: true\n- .refact/tasks present: true\n- git workspace detected: false\n"
+    },
+    {
+      "message_id": "d6ff5d69-eb5a-4639-b753-40dab15aa7ab",
+      "role": "assistant",
+      "content": "",
+      "finish_reason": "tool_calls",
+      "tool_calls": [
+        {
+          "id": "function-call-7459907951123028831",
+          "index": 0,
+          "function": {
+            "arguments": "{\"text\":\"It looks like a `README.md` file is missing. This is a great place to start documenting your project!\",\"mood\":\"curious\",\"intent\":\"suggestion\"}",
+            "name": "buddy_speak"
+          },
+          "type": "function"
+        },
+        {
+          "id": "function-call-7459907951123026880",
+          "index": 1,
+          "function": {
+            "arguments": "{\"status\":\"completed\",\"description\":\"Recommended creating README.md as it was missing from the checklist.\",\"title\":\"Setup Coach\"}",
+            "name": "buddy_runtime_event"
+          },
+          "type": "function"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 923,
+        "completion_tokens": 88,
+        "total_tokens": 1011
+      }
+    },
+    {
+      "message_id": "8fd46853-99e3-4ee8-b331-5f88cf365485",
+      "role": "tool",
+      "content": "Spoke: It looks like a `README.md` file is missing. This is a great place to start documenting your project!",
+      "tool_call_id": "function-call-7459907951123028831",
+      "tool_failed": false
+    },
+    {
+      "message_id": "fec895ee-9a48-4c3f-a8ac-636fb7949959",
+      "role": "tool",
+      "content": "Runtime event enqueued: Setup Coach",
+      "tool_call_id": "function-call-7459907951123026880",
+      "tool_failed": false
+    },
+    {
+      "message_id": "472a540c-181d-4887-a100-bae3c9595adf",
+      "role": "assistant",
+      "content": "It looks like a `README.md` file is missing. This is a great place to start documenting your project!",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 1076,
+        "completion_tokens": 25,
+        "total_tokens": 1101
+      }
+    }
+  ],
+  "created_at": "2026-06-19T14:08:32.800861600+00:00",
+  "boost_reasoning": false,
+  "checkpoints_enabled": true,
+  "context_tokens_cap": null,
+  "include_project_info": true,
+  "isTitleGenerated": false,
+  "auto_approve_editing_tools": false,
+  "auto_approve_dangerous_commands": false,
+  "autonomous_no_confirm": true,
+  "buddy_meta": {
+    "is_buddy_chat": true,
+    "buddy_chat_kind": "system",
+    "workflow_id": "buddy_setup_coach"
+  },
+  "root_chat_id": "buddy-buddy_setup_coach-beef1c75-a48c-4784-9b83-370c031ca941",
+  "updated_at": "2026-06-19T14:08:32.803947+00:00"
+}

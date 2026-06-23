@@ -1,0 +1,10 @@
+<div class="{{ wrapper_class|default:'' }}">
+  <label class="block text-xs font-semibold uppercase tracking-[0.04em] text-on-surface-variant mb-2">{{ label }}</label>
+  {{ field }}
+  {% if help_text %}
+    <p class="text-xs text-on-surface-variant mt-2">{{ help_text }}</p>
+  {% endif %}
+  {% if field.errors %}
+    <p class="text-sm text-red-600 mt-2">{{ field.errors.0 }}</p>
+  {% endif %}
+</div>

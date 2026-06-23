@@ -1,0 +1,49 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}{% if vehicle %}Edit Vehicle{% else %}Register Vehicle{% endif %} • SafeRide NG{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+  {% if vehicle %}
+    {% include "partials/page_header.html" with title="Edit Vehicle" subtitle="Submit complete vehicle details for SafeRide NG approval." action_url='driver_vehicle_list' action_label="Back to Vehicles" action_icon="arrow_back" %}
+  {% else %}
+    {% include "partials/page_header.html" with title="Register Vehicle" subtitle="Submit complete vehicle details for SafeRide NG approval." action_url='driver_vehicle_list' action_label="Back to Vehicles" action_icon="arrow_back" %}
+  {% endif %}
+
+  <div class="rounded-[2rem] border border-outline-variant/40 bg-white p-6 md:p-8 shadow-soft">
+    <form method="post" class="space-y-8">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+
+      <div>
+        <h3 class="text-lg font-semibold text-primary mb-5">Vehicle Identity</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {% include "partials/form_field.html" with field=form.plate_number label="Plate Number" wrapper_class="" %}
+          {% include "partials/form_field.html" with field=form.vehicle_type label="Vehicle Type" wrapper_class="" %}
+          {% include "partials/form_field.html" with field=form.vehicle_make label="Vehicle Make" wrapper_class="" %}
+          {% include "partials/form_field.html" with field=form.vehicle_model label="Vehicle Model" wrapper_class="" %}
+          {% include "partials/form_field.html" with field=form.vehicle_color label="Vehicle Color" wrapper_class="" %}
+          {% include "partials/form_field.html" with field=form.year label="Year" wrapper_class="" %}
+        </div>
+      </div>
+
+      <div>
+        <h3 class="text-lg font-semibold text-primary mb-5">Route and Insurance</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {% include "partials/form_field.html" with field=form.registered_route label="Registered Route" help_text="Example: Airport - City Centre" wrapper_class="md:col-span-2" %}
+          {% include "partials/form_field.html" with field=form.insurance_number label="Insurance Number" wrapper_class="md:col-span-2" %}
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3 pt-4">
+        <button type="submit" class="inline-flex flex-1 items-center justify-center rounded-xl bg-[#2563EB] px-5 py-3 text-white font-semibold shadow-sm hover:bg-[#1d4ed8] hover:shadow-md transition active:scale-[0.98]">
+          {% if vehicle %}Save Changes{% else %}Submit Vehicle{% endif %}
+        </button>
+        <a href="{% url 'driver_vehicle_list' %}" class="inline-flex items-center justify-center rounded-xl border border-outline-variant/60 bg-white px-5 py-3 text-primary font-semibold hover:bg-surface-container-low transition active:scale-[0.98]">
+          Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

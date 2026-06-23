@@ -1,0 +1,89 @@
+{
+  "id": "buddy-buddy_setup_coach-8d34e64a-8b70-497d-9cef-b717fb523549",
+  "title": "Setup Coach",
+  "model": "google_gemini/gemini-2.5-flash",
+  "mode": "buddy",
+  "tool_use": "tree,cat,create_textdoc,buddy_runtime_event,buddy_speak",
+  "messages": [
+    {
+      "role": "system",
+      "content": "%BUDDY_PERSONALITY%\n\nYou improve first-run and setup guidance for the project.\nPrefer small docs or checklist additions that help the user get unstuck.\nSpeak only when a friendly nudge is useful.\n\nSteps:\n1. Inspect the project tree and setup-related files.\n2. Identify missing, stale, or confusing setup guidance.\n3. Create a concise setup note when the improvement is obvious.\n4. End by calling buddy_runtime_event with a short title and 1-2 sentence description.\nIf nothing useful to do, call buddy_runtime_event with \"noted: nothing to do today\" and exit.\n"
+    },
+    {
+      "role": "user",
+      "content": "Workflow: buddy_setup_coach\nTitle: Setup Coach\nSignal hash: 6e92178aa6c675e858fc38c6676f2732159b9a182290e3a31e9d1003d22a181c\nPriority: normal\n\nTask:\nReview the local setup checklist and recommend the next onboarding step. Keep it practical and based only on the checklist.\n\nEvidence:\nLocal setup checklist:\n- AGENTS.md present: false\n- README present: false\n- .refact directory present: true\n- .refact/knowledge present: true\n- .refact/tasks present: true\n- git workspace detected: false\n"
+    },
+    {
+      "message_id": "3f05be94-5142-4ebe-b4d9-0a1d5d076cd3",
+      "role": "assistant",
+      "content": "",
+      "finish_reason": "tool_calls",
+      "tool_calls": [
+        {
+          "id": "function-call-9992755695102127374",
+          "index": 0,
+          "function": {
+            "arguments": "{\"mood\":\"curious\",\"text\":\"It looks like `README.md` is missing from your project. Adding a `README.md` is a great way to introduce your project to others (and your future self!).\",\"intent\":\"suggestion\"}",
+            "name": "buddy_speak"
+          },
+          "type": "function"
+        },
+        {
+          "id": "function-call-9992755695102126581",
+          "index": 1,
+          "function": {
+            "arguments": "{\"title\":\"Setup Coach\",\"status\":\"completed\",\"description\":\"Recommended creating README.md based on missing files in the checklist.\"}",
+            "name": "buddy_runtime_event"
+          },
+          "type": "function"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 923,
+        "completion_tokens": 101,
+        "total_tokens": 1024
+      }
+    },
+    {
+      "message_id": "e8200780-3860-4b7e-b9cd-e87036102242",
+      "role": "tool",
+      "content": "Spoke: It looks like `README.md` is missing from your project. Adding a `README.md` is a great way to introduce your project to others (and your future self!).",
+      "tool_call_id": "function-call-9992755695102127374",
+      "tool_failed": false
+    },
+    {
+      "message_id": "66f51362-e586-47c4-8841-12c62ed0b100",
+      "role": "tool",
+      "content": "Runtime event enqueued: Setup Coach",
+      "tool_call_id": "function-call-9992755695102126581",
+      "tool_failed": false
+    },
+    {
+      "message_id": "e2a08126-525d-432a-8dea-d3bf598ca0a2",
+      "role": "assistant",
+      "content": "It looks like `README.md` is missing from your project. Adding a `README.md` is a great way to introduce your project to others (and your future self!).",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 1102,
+        "completion_tokens": 37,
+        "total_tokens": 1139
+      }
+    }
+  ],
+  "created_at": "2026-06-18T03:32:55.334622400+00:00",
+  "boost_reasoning": false,
+  "checkpoints_enabled": true,
+  "context_tokens_cap": null,
+  "include_project_info": true,
+  "isTitleGenerated": false,
+  "auto_approve_editing_tools": false,
+  "auto_approve_dangerous_commands": false,
+  "autonomous_no_confirm": true,
+  "buddy_meta": {
+    "is_buddy_chat": true,
+    "buddy_chat_kind": "system",
+    "workflow_id": "buddy_setup_coach"
+  },
+  "root_chat_id": "buddy-buddy_setup_coach-8d34e64a-8b70-497d-9cef-b717fb523549",
+  "updated_at": "2026-06-18T03:32:55.342660200+00:00"
+}

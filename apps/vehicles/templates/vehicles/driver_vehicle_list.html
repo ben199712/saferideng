@@ -1,0 +1,213 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}My Vehicles • SafeRide NG{% endblock %}
+
+{% block content %}
+<div class="max-w-container-max mx-auto">
+  <div class="mb-lg animate-fade-in transition-all duration-700 opacity-100 translate-y-0">
+    <div class="bg-secondary-container/30 border border-secondary/20 rounded-xl p-6 md:p-xl flex flex-col md:flex-row items-center gap-md md:gap-lg shadow-sm">
+      <div class="w-16 h-16 md:w-20 md:h-20 bg-secondary rounded-full flex items-center justify-center text-on-secondary shadow-lg">
+        <span class="material-symbols-outlined text-4xl md:text-5xl" style="font-variation-settings: 'wght' 700;">directions_car</span>
+      </div>
+      <div class="text-center md:text-left">
+        <h1 class="font-display-sm text-display-sm text-primary mb-xs">My SafeRide Vehicles</h1>
+        <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">Manage your approved vehicles, view QR security stickers, and download passenger verification materials.</p>
+      </div>
+    </div>
+  </div>
+
+  {% if vehicles %}
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-lg pb-32">
+      {% for vehicle in vehicles %}
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-lg">
+          <div class="lg:col-span-5 space-y-lg">
+            <div class="bg-white rounded-xl border border-outline-variant/30 shadow-sm overflow-hidden group">
+              <div class="h-32 bg-primary-container relative">
+                <div class="absolute -bottom-12 left-6 w-24 h-24 rounded-xl border-4 border-white overflow-hidden shadow-md bg-primary flex items-center justify-center text-white text-4xl font-bold">
+                  {{ vehicle.driver.first_name|slice:":1" }}{{ vehicle.driver.last_name|slice:":1" }}
+                </div>
+                <div class="absolute top-4 right-6 bg-secondary text-on-secondary px-3 py-1 rounded-full font-label-md text-label-md flex items-center gap-1">
+                  <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">verified</span>
+                  {{ vehicle.get_vehicle_type_display }}
+                </div>
+              </div>
+              <div class="pt-16 px-6 pb-6">
+                <div class="mb-4">
+                  <h2 class="font-headline-md text-headline-md text-primary">{{ vehicle.plate_number }}</h2>
+                  <div class="flex items-center gap-2 mt-1">
+                    <span class="font-label-md text-label-md text-on-surface-variant">Driver:</span>
+                    <span class="font-label-md text-label-md text-primary font-bold">{{ vehicle.driver.full_name }}</span>
+                  </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4 border-t border-outline-variant/30 pt-4">
+                  <div>
+                    <p class="font-caption text-caption text-on-surface-variant uppercase tracking-widest">Make</p>
+                    <p class="font-label-md text-label-md text-on-surface">{{ vehicle.vehicle_make }}</p>
+                  </div>
+                  <div>
+                    <p class="font-caption text-caption text-on-surface-variant uppercase tracking-widest">Model</p>
+                    <p class="font-label-md text-label-md text-on-surface">{{ vehicle.vehicle_model }}</p>
+                  </div>
+                  <div>
+                    <p class="font-caption text-caption text-on-surface-variant uppercase tracking-widest">Color</p>
+                    <p class="font-label-md text-label-md text-on-surface">{{ vehicle.vehicle_color }}</p>
+                  </div>
+                  <div>
+                    <p class="font-caption text-caption text-on-surface-variant uppercase tracking-widest">Year</p>
+                    <p class="font-label-md text-label-md text-on-surface">{{ vehicle.year }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-surface-container-low rounded-xl p-6 border border-outline-variant/30">
+              <h3 class="font-label-md text-label-md text-primary uppercase tracking-widest mb-4">Route Information</h3>
+              <div class="flex items-center gap-md">
+                <div class="w-16 h-16 rounded-lg bg-surface-container-high flex items-center justify-center text-primary">
+                  <span class="material-symbols-outlined text-3xl">route</span>
+                </div>
+                <div class="flex-1">
+                  <div class="flex justify-between items-center">
+                    <span class="font-headline-sm text-headline-sm font-bold text-primary">Registered Route</span>
+                    {% include "partials/status_badge.html" with status=vehicle.verification_status active=vehicle.is_active %}
+                  </div>
+                  <p class="font-body-md text-body-md text-on-surface-variant mt-2">{{ vehicle.registered_route }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-md">
+              <h3 class="font-headline-md text-headline-md text-primary">Activation Protocol</h3>
+              <div class="space-y-3">
+                <div class="flex gap-md p-3 rounded-lg hover:bg-surface-container transition-colors">
+                  <div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">1</div>
+                  <p class="font-body-md text-body-md text-on-surface-variant">Display the QR sticker on the lower-left corner of your front windshield.</p>
+                </div>
+                <div class="flex gap-md p-3 rounded-lg hover:bg-surface-container transition-colors">
+                  <div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">2</div>
+                  <p class="font-body-md text-body-md text-on-surface-variant">Keep your digital ID handy for passenger verification during boarding.</p>
+                </div>
+                <div class="flex gap-md p-3 rounded-lg hover:bg-surface-container transition-colors">
+                  <div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">3</div>
+                  <p class="font-body-md text-body-md text-on-surface-variant">Ask passengers to scan before entering the vehicle.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="lg:col-span-7">
+            <div class="bg-white rounded-xl border border-outline-variant/50 shadow-lg p-6 md:p-lg flex flex-col items-center text-center">
+              <div class="w-full border-2 border-dashed border-outline-variant/50 rounded-xl p-8 bg-surface mb-lg">
+                <div class="max-w-sm mx-auto bg-white p-6 rounded-2xl shadow-xl relative animate-pulse-soft">
+                  <div class="flex justify-between items-center mb-6">
+                    <div class="font-headline-sm text-headline-sm font-extrabold text-primary tracking-tighter">SafeRide NG</div>
+                    <div class="bg-secondary/10 text-secondary px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest border border-secondary/20">Official Security Node</div>
+                  </div>
+
+                  {% if vehicle.qr_code and vehicle.qr_code.qr_image %}
+                    <div class="aspect-square bg-white border-8 border-primary rounded-xl flex items-center justify-center relative overflow-hidden">
+                      <img src="{{ vehicle.qr_code.qr_image.url }}?v={{ vehicle.qr_code.token }}" alt="Vehicle QR Code" class="w-full h-full object-contain rounded-lg p-2">
+                    </div>
+                  {% else %}
+                    <div class="aspect-square bg-surface-container-low border-8 border-primary rounded-xl flex flex-col items-center justify-center relative">
+                      <span class="material-symbols-outlined text-7xl text-on-surface-variant">qr_code</span>
+                      <p class="font-label-md text-label-md text-on-surface-variant mt-3">QR pending approval</p>
+                    </div>
+                  {% endif %}
+
+                  <div class="mt-6">
+                    <p class="font-headline-md text-headline-md text-primary font-bold">{{ vehicle.plate_number }}</p>
+                    <p class="font-caption text-caption text-on-surface-variant uppercase tracking-widest mt-1">QR Token</p>
+                    <p class="font-mono text-[10px] text-on-surface-variant break-all">{{ vehicle.qr_code.token }}</p>
+                    <p class="font-caption text-caption text-on-surface-variant uppercase tracking-widest mt-3">Scan to Verify Vehicle Credentials</p>
+                  </div>
+                  <div class="absolute -bottom-2 -left-2 w-12 h-12 opacity-10 bg-[radial-gradient(circle,theme(colors.primary)_1px,transparent_1px)] bg-[size:4px_4px]"></div>
+                </div>
+              </div>
+
+              <div class="max-w-md w-full">
+                <h4 class="font-headline-md text-headline-md text-primary mb-2">Vehicle QR Display</h4>
+                <p class="font-body-md text-body-md text-on-surface-variant mb-lg">Passengers are instructed to scan this code before entering. Ensure it is printed on weather-resistant material for the exterior window.</p>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-md">
+                  {% if vehicle.qr_code and vehicle.qr_code.qr_image %}
+                    <a href="{% url 'driver_vehicle_download_qr' vehicle.uuid %}" class="download-action flex items-center justify-center gap-2 bg-primary text-on-primary font-label-md text-label-md py-4 px-6 rounded-lg shadow-md hover:bg-primary-container transition-all active:scale-95">
+                      <span class="material-symbols-outlined">picture_as_pdf</span>
+                      Download QR Sticker
+                    </a>
+                    <a href="{{ vehicle.qr_code.qr_image.url }}?v={{ vehicle.qr_code.token }}" target="_blank" rel="noopener noreferrer" class="download-action flex items-center justify-center gap-2 bg-white text-primary border border-primary/20 font-label-md text-label-md py-4 px-6 rounded-lg hover:bg-surface-container-low transition-all active:scale-95">
+                      <span class="material-symbols-outlined">image</span>
+                      Save QR Image
+                    </a>
+                    <button type="button" class="print-action sm:col-span-2 flex items-center justify-center gap-2 bg-secondary-container text-on-secondary-container font-label-md text-label-md py-4 px-6 rounded-lg hover:brightness-95 transition-all active:scale-95">
+                      <span class="material-symbols-outlined">print</span>
+                      Print Verification Label
+                    </button>
+                  {% else %}
+                    <span class="sm:col-span-2 flex items-center justify-center gap-2 bg-surface-container-highest text-on-surface-variant font-label-md text-label-md py-4 px-6 rounded-lg">
+                      <span class="material-symbols-outlined">pending_actions</span>
+                      QR Sticker Pending Approval
+                    </span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <a href="mailto:support@saferide.ng" class="mt-lg w-full p-4 border-2 border-dashed border-error/30 rounded-xl flex items-center justify-center gap-md text-error hover:bg-error/5 transition-colors group">
+              <span class="material-symbols-outlined group-hover:animate-pulse">report</span>
+              <span class="font-label-md text-label-md">Need assistance with your materials? Contact Support</span>
+            </a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="rounded-[2rem] border border-dashed border-outline-variant bg-white p-10 text-center shadow-sm pb-32">
+      <div class="w-16 h-16 rounded-full bg-blue-50 text-primary flex items-center justify-center mx-auto mb-5">
+        <span class="material-symbols-outlined text-4xl">directions_car</span>
+      </div>
+      <h2 class="text-2xl font-bold text-primary tracking-[-0.02em]">No vehicles registered yet</h2>
+      <p class="text-sm text-on-surface-variant mt-2 max-w-md mx-auto">Add your first vehicle to begin the approval workflow and receive a secure QR code after admin approval.</p>
+      <a href="{% url 'driver_vehicle_create' %}" class="inline-flex items-center justify-center rounded-xl bg-[#2563EB] px-5 py-3 text-white font-semibold mt-6 hover:bg-[#1d4ed8] transition active:scale-[0.98]">Register Vehicle</a>
+    </div>
+  {% endif %}
+</div>
+
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-16 px-4 bg-surface/90 backdrop-blur-lg border-t border-outline-variant/30 lg:hidden shadow-[0_-4px_20px_rgba(0,51,102,0.08)]">
+  <a class="flex flex-col items-center justify-center text-on-surface-variant opacity-70 active:scale-90 transition-transform" href="{% url 'home' %}">
+    <span class="material-symbols-outlined">home</span>
+    <span class="text-[10px] font-medium">Home</span>
+  </a>
+  <a class="flex flex-col items-center justify-center text-primary font-bold active:scale-90 transition-transform" href="{% url 'driver_vehicle_list' %}">
+    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">directions_car</span>
+    <span class="text-[10px]">Vehicles</span>
+  </a>
+  <a class="flex flex-col items-center justify-center text-on-surface-variant opacity-70 active:scale-90 transition-transform" href="{% url 'my_trips' %}">
+    <span class="material-symbols-outlined">timeline</span>
+    <span class="text-[10px] font-medium">History</span>
+  </a>
+  <a class="flex flex-col items-center justify-center text-error font-bold active:scale-90 transition-transform" href="{% url 'emergency_contact_list' %}">
+    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">emergency</span>
+    <span class="text-[10px]">SOS</span>
+  </a>
+</nav>
+
+<script>
+  document.querySelectorAll('.download-action').forEach(button => {
+    button.addEventListener('click', () => {
+      const originalContent = button.innerHTML;
+      button.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> Processing...';
+      setTimeout(() => {
+        button.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Success';
+        setTimeout(() => {
+          button.innerHTML = originalContent;
+        }, 2000);
+      }, 1500);
+    });
+  });
+
+  document.querySelectorAll('.print-action').forEach(button => {
+    button.addEventListener('click', () => window.print());
+  });
+</script>
+{% endblock %}

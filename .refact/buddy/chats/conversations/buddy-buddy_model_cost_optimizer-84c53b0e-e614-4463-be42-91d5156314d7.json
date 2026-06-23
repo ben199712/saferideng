@@ -1,0 +1,90 @@
+{
+  "id": "buddy-buddy_model_cost_optimizer-84c53b0e-e614-4463-be42-91d5156314d7",
+  "title": "Model/Cost Optimizer",
+  "model": "google_gemini/gemini-2.5-flash",
+  "mode": "buddy",
+  "tool_use": "cat,buddy_runtime_event,buddy_speak",
+  "messages": [
+    {
+      "role": "system",
+      "content": "%BUDDY_PERSONALITY%\n\nYou review model usage evidence for obvious cost or latency improvements.\nKeep suggestions practical and avoid changing behavior without clear benefit.\nSpeak only when there is a simple user-facing nudge.\n\nSteps:\n1. Read the model usage and cost evidence.\n2. Identify one concise optimization or decide the current setup is fine.\n3. Speak when a friendly recommendation would help the user.\n4. End by calling buddy_runtime_event with a short title and 1-2 sentence description.\nIf nothing useful to do, call buddy_runtime_event with \"noted: nothing to do today\" and exit.\n"
+    },
+    {
+      "role": "user",
+      "content": "Workflow: buddy_model_cost_optimizer\nTitle: Model/Cost Optimizer\nSignal hash: ddff2c08938927c342858e056546d56952959639f77deeec39850fcbd21f97f0\nPriority: normal\n\nTask:\nAnalyze aggregate LLM usage, reliability, latency, token, and spend signals. Recommend model or configuration optimizations using aggregate stats only; do not infer message content.\n\nEvidence:\nrecent_window max_events=500 calls_bucket=100-249 successful_bucket=50-99 failed_bucket=100-249 failure_rate_bucket=50-74% total_tokens_bucket=10k-49k prompt_tokens_bucket=1-9k completion_tokens_bucket=1-9k cache_read_tokens_bucket=0 cache_creation_tokens_bucket=0 total_cost_usd_bucket=0 avg_duration_bucket=under_5s conversations_bucket=100-249 messages_sent_bucket=250-499\nmodel id=google_gemini/gemini-2.5-flash-lite provider=google_gemini model=gemini-2.5-flash-lite calls_bucket=100-249 failed_bucket=100-249 failure_rate_bucket=50-74% tokens_bucket=10k-49k cost_usd_bucket=0 avg_duration_bucket=under_5s\nmodel id=google_gemini/gemini-2.5-flash provider=google_gemini model=gemini-2.5-flash calls_bucket=1-4 failed_bucket=0 failure_rate_bucket=0% tokens_bucket=1-9k cost_usd_bucket=0 avg_duration_bucket=under_5s\nprovider name=google_gemini calls_bucket=100-249 failed_bucket=100-249 failure_rate_bucket=50-74% tokens_bucket=10k-49k cost_usd_bucket=0 total_duration_bucket=60s+\n"
+    },
+    {
+      "message_id": "31511073-f2f6-4e97-8283-d2448ecc7a43",
+      "role": "assistant",
+      "content": "",
+      "finish_reason": "tool_calls",
+      "tool_calls": [
+        {
+          "id": "function-call-16087560642373303063",
+          "index": 0,
+          "function": {
+            "arguments": "{\"text\":\"It looks like the `gemini-2.5-flash-lite` model is experiencing a high failure rate. You might want to consider using `gemini-2.5-flash` instead, as it shows a much lower failure rate in your recent usage.\",\"mood\":\"cautious\",\"intent\":\"suggestion\"}",
+            "name": "buddy_speak"
+          },
+          "type": "function"
+        },
+        {
+          "id": "function-call-16087560642373303442",
+          "index": 1,
+          "function": {
+            "arguments": "{\"title\":\"Consider switching models\",\"status\":\"completed\",\"description\":\"Suggesting a switch from gemini-2.5-flash-lite to gemini-2.5-flash due to high failure rates observed with the lite version.\"}",
+            "name": "buddy_runtime_event"
+          },
+          "type": "function"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1016,
+        "completion_tokens": 142,
+        "total_tokens": 1158
+      }
+    },
+    {
+      "message_id": "ed42d089-dba7-4264-8dfe-a9c988a11932",
+      "role": "tool",
+      "content": "Spoke: It looks like the `gemini-2.5-flash-lite` model is experiencing a high failure rate. You might want to consider using `gemini-2.5-flash` instead, as it shows a much lower failure rate in your recent usage.",
+      "tool_call_id": "function-call-16087560642373303063",
+      "tool_failed": false
+    },
+    {
+      "message_id": "20855099-9a3d-407c-8b5e-ccd972095dbe",
+      "role": "tool",
+      "content": "Runtime event enqueued: Consider switching models",
+      "tool_call_id": "function-call-16087560642373303442",
+      "tool_failed": false
+    },
+    {
+      "message_id": "9b0a1f68-1f57-4b47-8f18-5bcff961139f",
+      "role": "assistant",
+      "content": "It looks like the `gemini-2.5-flash-lite` model is experiencing a high failure rate. You might want to consider using `gemini-2.5-flash` instead, as it shows a much lower failure rate in your recent usage.\n",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 493,
+        "completion_tokens": 55,
+        "total_tokens": 1309,
+        "cache_read_input_tokens": 761
+      }
+    }
+  ],
+  "created_at": "2026-06-18T03:34:13.700852100+00:00",
+  "boost_reasoning": false,
+  "checkpoints_enabled": true,
+  "context_tokens_cap": null,
+  "include_project_info": true,
+  "isTitleGenerated": false,
+  "auto_approve_editing_tools": false,
+  "auto_approve_dangerous_commands": false,
+  "autonomous_no_confirm": true,
+  "buddy_meta": {
+    "is_buddy_chat": true,
+    "buddy_chat_kind": "system",
+    "workflow_id": "buddy_model_cost_optimizer"
+  },
+  "root_chat_id": "buddy-buddy_model_cost_optimizer-84c53b0e-e614-4463-be42-91d5156314d7",
+  "updated_at": "2026-06-18T03:34:13.705847900+00:00"
+}

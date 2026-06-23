@@ -1,0 +1,108 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Vehicle Verification • SafeRide NG{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto">
+  <div class="rounded-[2rem] border border-outline-variant/40 bg-white p-6 md:p-8 shadow-elevated">
+    {% if state == 'verified' %}
+      {% with icon='verified' title='Vehicle Verified' description='This vehicle has been approved and is active on SafeRide NG.' tone='green' %}
+        {% include "partials/verification_hero.html" %}
+      {% endwith %}
+    {% elif state == 'rejected' %}
+      {% with icon='cancel' title='Vehicle Not Verified' description='This vehicle has been rejected and should not be considered approved.' tone='red' %}
+        {% include "partials/verification_hero.html" %}
+      {% endwith %}
+    {% elif state == 'suspended' %}
+      {% with icon='pause_circle' title='Vehicle Suspended' description='This vehicle is currently suspended and inactive.' tone='amber' %}
+        {% include "partials/verification_hero.html" %}
+      {% endwith %}
+    {% elif state == 'pending' %}
+      {% with icon='info' title='Verification Pending' description='This vehicle is still awaiting admin approval.' tone='blue' %}
+        {% include "partials/verification_hero.html" %}
+      {% endwith %}
+    {% else %}
+      {% with icon='error' title='Invalid QR Code' description='The QR code you scanned is not valid or is no longer active.' tone='red' %}
+        {% include "partials/verification_hero.html" %}
+      {% endwith %}
+    {% endif %}
+
+    {% if vehicle %}
+      <div class="mt-8">
+        <div class="flex items-center justify-between gap-4 mb-5">
+          <div>
+            <h2 class="text-xl font-bold text-primary tracking-[-0.02em]">Verification Record</h2>
+            <p class="text-sm text-on-surface-variant mt-1">Official SafeRide NG vehicle and driver details.</p>
+          </div>
+          {% include "partials/status_badge.html" with status=vehicle.verification_status active=vehicle.is_active %}
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-6">
+          <div class="space-y-4">
+            <div class="rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-5">
+              <div class="flex items-center gap-4">
+                <div class="w-16 h-16 rounded-2xl bg-[#2563EB] text-white flex items-center justify-center text-xl font-bold shadow-sm">
+                  {{ vehicle.driver.first_name|slice:":1" }}{{ vehicle.driver.last_name|slice:":1" }}
+                </div>
+                <div>
+                  <div class="text-xs font-semibold uppercase tracking-[0.04em] text-on-surface-variant">Driver Photo</div>
+                  <div class="text-lg font-bold text-on-surface mt-1">{{ vehicle.driver.full_name }}</div>
+                  <div class="text-sm text-on-surface-variant">{{ vehicle.driver.email }}</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {% include "partials/info_tile.html" with label="Plate Number" value=vehicle.plate_number wrapper_class="" %}
+              {% include "partials/info_tile.html" with label="Vehicle Type" value=vehicle.get_vehicle_type_display wrapper_class="" %}
+              {% include "partials/info_tile.html" with label="Vehicle Model" value=vehicle.vehicle_make|add:" "|add:vehicle.vehicle_model wrapper_class="" %}
+              {% include "partials/info_tile.html" with label="Color" value=vehicle.vehicle_color wrapper_class="" %}
+              {% include "partials/info_tile.html" with label="Registered Route" value=vehicle.registered_route wrapper_class="md:col-span-2" %}
+              {% include "partials/info_tile.html" with label="Insurance Number" value=vehicle.insurance_number wrapper_class="md:col-span-2" %}
+            </div>
+          </div>
+
+          <div class="rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-6">
+            <div class="text-xs font-semibold uppercase tracking-[0.04em] text-on-surface-variant mb-4">QR Code</div>
+            {% if qr_code and qr_code.qr_image %}
+              <div class="rounded-2xl bg-white border border-outline-variant/30 p-4 flex justify-center">
+                <img src="{{ qr_code.qr_image.url }}" alt="QR code" class="w-48 h-48 object-contain" />
+              </div>
+              <div class="mt-5 space-y-3 text-sm">
+                <div class="flex items-center justify-between">
+                  <span class="text-on-surface-variant">Token</span>
+                  <span class="font-mono text-xs text-on-surface break-all text-right">{{ qr_code.token }}</span>
+                </div>
+                {% if vehicle.approved_at %}
+                  <div class="flex items-center justify-between">
+                    <span class="text-on-surface-variant">Approval Date</span>
+                    <span class="font-semibold text-on-surface">{{ vehicle.approved_at|date:"M d, Y" }}</span>
+                  </div>
+                {% endif %}
+              </div>
+            {% else %}
+              <div class="rounded-2xl border border-dashed border-outline-variant bg-white p-8 text-center text-sm text-on-surface-variant">
+                No QR code is available for this vehicle yet.
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        {% if can_start_trip %}
+          <div class="mt-8 rounded-[2rem] border border-green-200 bg-green-50 p-6">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <div class="text-lg font-bold text-green-800">Ready to start your trip?</div>
+                <div class="text-sm text-green-700 mt-1">Enter passenger details and destination to create a live SafeRide trip record.</div>
+              </div>
+              <a href="{% url 'trip_start' qr_code.token %}" class="inline-flex items-center justify-center rounded-xl bg-[#2563EB] px-5 py-3 text-white font-semibold hover:bg-[#1d4ed8] transition active:scale-[0.98]">
+                Start Trip
+              </a>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

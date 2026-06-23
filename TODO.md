@@ -1,0 +1,11 @@
+- [x] Load `{% load static %}` in `templates/layouts/base.html`
+- [x] Add static smoke-test usage for `static/logo.svg`
+- [x] Ensure a page route renders the static smoke-test template
+- [x] Run Django dev server and confirm `GET /static/logo.svg` works through `/static-test/`
+- [x] Register the dashboard app so dashboard templates resolve
+- [x] Complete password reset done/confirm/complete routes and templates
+- [x] Restrict admin dashboard and approval actions to admin/super-admin users
+- [x] Allow drivers to update/resubmit existing driver profiles
+- [x] Add automated tests for auth redirects, password reset URLs, driver profile updates, and admin approval authorization
+- [ ] Add end-to-end browser verification for auth, driver registration, and dashboard workflows
+- [ ] Add production environment settings for SECRET_KEY, DEBUG, ALLOWED_HOSTS, email backend, CSRF, and database configuration

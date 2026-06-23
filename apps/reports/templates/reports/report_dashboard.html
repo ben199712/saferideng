@@ -1,0 +1,94 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Report Dashboard • SafeRide NG{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+  {% include "partials/page_header.html" with title="Report Dashboard" subtitle="Review and close passenger incident reports." %}
+
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+    <div class="rounded-[1.5rem] border border-outline-variant/40 bg-white p-5 shadow-soft">
+      <div class="flex items-center justify-between">
+        <div class="text-xs font-semibold uppercase tracking-[0.04em] text-on-surface-variant">Total Reports</div>
+        <span class="material-symbols-outlined text-primary">gavel</span>
+      </div>
+      <div class="text-3xl font-bold text-primary mt-4">{{ stats.total }}</div>
+    </div>
+    <div class="rounded-[1.5rem] border border-outline-variant/40 bg-white p-5 shadow-soft">
+      <div class="flex items-center justify-between">
+        <div class="text-xs font-semibold uppercase tracking-[0.04em] text-on-surface-variant">Open Reports</div>
+        <span class="material-symbols-outlined text-amber-700">pending_actions</span>
+      </div>
+      <div class="text-3xl font-bold text-amber-700 mt-4">{{ stats.open }}</div>
+    </div>
+    <div class="rounded-[1.5rem] border border-outline-variant/40 bg-white p-5 shadow-soft">
+      <div class="flex items-center justify-between">
+        <div class="text-xs font-semibold uppercase tracking-[0.04em] text-on-surface-variant">Under Review</div>
+        <span class="material-symbols-outlined text-blue-700">review</span>
+      </div>
+      <div class="text-3xl font-bold text-blue-700 mt-4">{{ stats.under_review }}</div>
+    </div>
+    <div class="rounded-[1.5rem] border border-outline-variant/40 bg-white p-5 shadow-soft">
+      <div class="flex items-center justify-between">
+        <div class="text-xs font-semibold uppercase tracking-[0.04em] text-on-surface-variant">Closed Reports</div>
+        <span class="material-symbols-outlined text-green-700">verified</span>
+      </div>
+      <div class="text-3xl font-bold text-green-700 mt-4">{{ stats.closed }}</div>
+    </div>
+  </div>
+
+  <div class="rounded-[2rem] border border-outline-variant/40 bg-white shadow-soft overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-sm">
+        <thead class="text-left bg-surface-container-low text-on-surface-variant">
+          <tr>
+            <th class="py-4 px-5 font-semibold">Report ID</th>
+            <th class="py-4 px-5 font-semibold">Type</th>
+            <th class="py-4 px-5 font-semibold">Trip</th>
+            <th class="py-4 px-5 font-semibold">Status</th>
+            <th class="py-4 px-5 font-semibold">Created At</th>
+            <th class="py-4 px-5 font-semibold">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-outline-variant/30">
+          {% if reports %}
+            {% for report in reports %}
+              <tr class="hover:bg-surface-container-low/70 transition">
+                <td class="py-4 px-5 font-mono text-xs text-on-surface">{{ report.uuid }}</td>
+                <td class="py-4 px-5 font-semibold text-on-surface">{{ report.get_report_type_display }}</td>
+                <td class="py-4 px-5">
+                  <div class="text-on-surface">{{ report.trip.destination }}</div>
+                  <div class="text-xs text-on-surface-variant">{{ report.trip.vehicle.plate_number }}</div>
+                </td>
+                <td class="py-4 px-5">
+                  {% if report.status == 'closed' %}
+                    <span class="rounded-full bg-green-50 text-green-700 border border-green-200 px-3 py-1 text-xs font-semibold">Closed</span>
+                  {% elif report.status == 'under_review' %}
+                    <span class="rounded-full bg-blue-50 text-blue-700 border border-blue-200 px-3 py-1 text-xs font-semibold">Under Review</span>
+                  {% else %}
+                    <span class="rounded-full bg-amber-50 text-amber-700 border border-amber-200 px-3 py-1 text-xs font-semibold">Open</span>
+                  {% endif %}
+                </td>
+                <td class="py-4 px-5 text-on-surface-variant">{{ report.created_at|date:"M d, Y h:i A" }}</td>
+                <td class="py-4 px-5">
+                  <div class="flex flex-wrap gap-2">
+                    <a href="{% url 'incident_report_detail' report.uuid %}" class="inline-flex rounded-xl border border-outline-variant/60 bg-white px-3 py-2 text-primary font-semibold hover:bg-surface-container-low transition">View</a>
+                    {% if report.status != 'closed' %}
+                      <form method="post" action="{% url 'incident_report_close' report.uuid %}">
+                        {% csrf_token %}
+                        <button type="submit" class="inline-flex rounded-xl bg-green-600 px-3 py-2 text-white font-semibold hover:bg-green-700 transition">Close</button>
+                      </form>
+                    {% endif %}
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          {% else %}
+            <tr><td class="py-8 text-center text-on-surface-variant" colspan="6">No incident reports found.</td></tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

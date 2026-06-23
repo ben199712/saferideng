@@ -1,0 +1,66 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Incident Report Detail • SafeRide NG{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+  {% include "partials/page_header.html" with title="Incident Report Detail" subtitle="Review incident details and resolve reports." %}
+
+  <div class="mb-6 flex flex-col sm:flex-row gap-3">
+    <a href="{% url 'report_dashboard' %}" class="inline-flex items-center justify-center rounded-xl border border-outline-variant/60 bg-white px-5 py-3 text-primary font-semibold hover:bg-surface-container-low transition">Back to Dashboard</a>
+    {% if report.status != 'closed' %}
+      <form method="post" action="{% url 'incident_report_close' report.uuid %}">
+        {% csrf_token %}
+        <button type="submit" class="inline-flex items-center justify-center rounded-xl bg-green-600 px-5 py-3 text-white font-semibold hover:bg-green-700 transition active:scale-[0.98]">Close Report</button>
+      </form>
+    {% endif %}
+  </div>
+
+  <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+    <div class="rounded-[2rem] border border-outline-variant/40 bg-white p-6 shadow-soft">
+      <div class="text-xs font-semibold uppercase tracking-[0.04em] text-on-surface-variant mb-5">Report Details</div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {% include "partials/info_tile.html" with label="Report ID" value=report.uuid wrapper_class="" %}
+        {% include "partials/info_tile.html" with label="Status" value=report.get_status_display wrapper_class="" %}
+        {% include "partials/info_tile.html" with label="Type" value=report.get_report_type_display wrapper_class="" %}
+        {% include "partials/info_tile.html" with label="Created" value=report.created_at|date:"M d, Y h:i A" wrapper_class="" %}
+      </div>
+      <div class="mt-5 rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-5">
+        <div class="text-xs font-semibold uppercase tracking-[0.04em] text-on-surface-variant mb-2">Description</div>
+        <div class="text-sm text-on-surface whitespace-pre-line">{{ report.description }}</div>
+      </div>
+    </div>
+
+    <div class="rounded-[2rem] border border-outline-variant/40 bg-white p-6 shadow-soft">
+      <div class="text-xs font-semibold uppercase tracking-[0.04em] text-on-surface-variant mb-5">Trip Details</div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {% include "partials/info_tile.html" with label="Passenger" value=report.trip.passenger_name wrapper_class="" %}
+        {% include "partials/info_tile.html" with label="Phone" value=report.trip.passenger_phone wrapper_class="" %}
+        {% include "partials/info_tile.html" with label="Destination" value=report.trip.destination wrapper_class="" %}
+        {% include "partials/info_tile.html" with label="Start Location" value=report.trip.start_location wrapper_class="" %}
+        {% include "partials/info_tile.html" with label="Trip Status" value=report.trip.get_trip_status_display wrapper_class="" %}
+        {% include "partials/info_tile.html" with label="Started" value=report.trip.started_at|date:"M d, Y h:i A" wrapper_class="" %}
+      </div>
+    </div>
+
+    <div class="space-y-6">
+      <div class="rounded-[2rem] border border-outline-variant/40 bg-white p-6 shadow-soft">
+        <div class="text-xs font-semibold uppercase tracking-[0.04em] text-on-surface-variant mb-5">Driver Details</div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {% include "partials/info_tile.html" with label="Name" value=report.trip.driver.full_name wrapper_class="" %}
+          {% include "partials/info_tile.html" with label="Email" value=report.trip.driver.email wrapper_class="" %}
+        </div>
+      </div>
+      <div class="rounded-[2rem] border border-outline-variant/40 bg-white p-6 shadow-soft">
+        <div class="text-xs font-semibold uppercase tracking-[0.04em] text-on-surface-variant mb-5">Vehicle Details</div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {% include "partials/info_tile.html" with label="Plate Number" value=report.trip.vehicle.plate_number wrapper_class="" %}
+          {% include "partials/info_tile.html" with label="Type" value=report.trip.vehicle.get_vehicle_type_display wrapper_class="" %}
+          {% include "partials/info_tile.html" with label="Make" value=report.trip.vehicle.vehicle_make wrapper_class="" %}
+          {% include "partials/info_tile.html" with label="Model" value=report.trip.vehicle.vehicle_model wrapper_class="" %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

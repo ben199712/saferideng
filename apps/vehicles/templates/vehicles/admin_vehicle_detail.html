@@ -1,0 +1,130 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Vehicle Details • SafeRide NG{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+  {% include "partials/page_header.html" with title="Vehicle Details" subtitle="Review vehicle information, driver details, QR status, and approval actions." action_url='admin_vehicle_dashboard' action_label="Back to Dashboard" action_icon="arrow_back" %}
+
+  <div class="grid grid-cols-1 lg:grid-cols-[1.15fr_0.85fr] gap-6">
+    <div class="space-y-6">
+      <div class="rounded-[2rem] border border-outline-variant/40 bg-white p-6 md:p-8 shadow-soft">
+        <div class="flex items-start justify-between gap-4 mb-6">
+          <div>
+            <div class="text-xs font-semibold uppercase tracking-[0.04em] text-on-surface-variant">Plate Number</div>
+            <div class="text-3xl font-bold text-primary tracking-[-0.02em] mt-1">{{ vehicle.plate_number }}</div>
+          </div>
+          {% include "partials/status_badge.html" with status=vehicle.verification_status active=vehicle.is_active %}
+        </div>
+
+        <h3 class="text-lg font-semibold text-primary mb-4">Vehicle Information</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {% include "partials/info_tile.html" with label="Vehicle Type" value=vehicle.get_vehicle_type_display wrapper_class="" %}
+          {% include "partials/info_tile.html" with label="Make" value=vehicle.vehicle_make wrapper_class="" %}
+          {% include "partials/info_tile.html" with label="Model" value=vehicle.vehicle_model wrapper_class="" %}
+          {% include "partials/info_tile.html" with label="Color" value=vehicle.vehicle_color wrapper_class="" %}
+          {% include "partials/info_tile.html" with label="Year" value=vehicle.year wrapper_class="" %}
+          {% include "partials/info_tile.html" with label="Created" value=vehicle.created_at|date:"M d, Y" meta=vehicle.created_at|date:"H:i" wrapper_class="" %}
+          {% include "partials/info_tile.html" with label="Registered Route" value=vehicle.registered_route wrapper_class="md:col-span-2" %}
+          {% include "partials/info_tile.html" with label="Insurance Number" value=vehicle.insurance_number wrapper_class="md:col-span-2" %}
+        </div>
+      </div>
+
+      <div class="rounded-[2rem] border border-outline-variant/40 bg-white p-6 md:p-8 shadow-soft">
+        <h3 class="text-lg font-semibold text-primary mb-4">Driver Information</h3>
+        <div class="flex items-center gap-4 rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-5">
+          <div class="w-16 h-16 rounded-2xl bg-[#2563EB] text-white flex items-center justify-center text-xl font-bold">
+            {{ vehicle.driver.first_name|slice:":1" }}{{ vehicle.driver.last_name|slice:":1" }}
+          </div>
+          <div class="flex-1">
+            <div class="text-lg font-bold text-on-surface">{{ vehicle.driver.full_name }}</div>
+            <div class="text-sm text-on-surface-variant">{{ vehicle.driver.email }}</div>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          {% include "partials/info_tile.html" with label="Phone" value=vehicle.driver.phone_number|default:"Not provided" wrapper_class="" %}
+          {% include "partials/info_tile.html" with label="Role" value=vehicle.driver.get_role_display wrapper_class="" %}
+        </div>
+      </div>
+    </div>
+
+    <div class="space-y-6">
+      <div class="rounded-[2rem] border border-outline-variant/40 bg-white p-6 md:p-8 shadow-soft">
+        <h3 class="text-lg font-semibold text-primary mb-5">QR Information</h3>
+        {% if qr_code %}
+          <div class="space-y-4">
+            <div class="rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-5">
+              <div class="text-xs font-semibold uppercase tracking-[0.04em] text-on-surface-variant mb-3">QR Preview</div>
+              {% if qr_code.qr_image %}
+                <div class="flex justify-center">
+                  <img src="{{ qr_code.qr_image.url }}" alt="QR preview" class="w-48 h-48 object-contain rounded-2xl border border-outline-variant/30 bg-white p-3" />
+                </div>
+                <a href="{% url 'admin_vehicle_download_qr' vehicle.uuid %}" class="mt-5 inline-flex w-full items-center justify-center rounded-xl bg-[#2563EB] px-4 py-3 text-white font-semibold hover:bg-[#1d4ed8] transition active:scale-[0.98]">
+                  Download QR
+                </a>
+              {% else %}
+                <div class="rounded-2xl border border-dashed border-outline-variant bg-white p-8 text-center text-sm text-on-surface-variant">
+                  QR image is not available yet.
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="grid grid-cols-1 gap-3 text-sm">
+              <div class="flex items-center justify-between rounded-xl bg-surface-container-low p-4">
+                <span class="text-on-surface-variant">Token</span>
+                <span class="font-mono text-xs text-on-surface text-right break-all">{{ qr_code.token }}</span>
+              </div>
+              <div class="flex items-center justify-between rounded-xl bg-surface-container-low p-4">
+                <span class="text-on-surface-variant">Created</span>
+                <span class="font-semibold text-on-surface">{{ qr_code.created_at|date:"M d, Y H:i" }}</span>
+              </div>
+              <div class="flex items-center justify-between rounded-xl bg-surface-container-low p-4">
+                <span class="text-on-surface-variant">Scan Count</span>
+                <span class="font-semibold text-on-surface">{{ scan_count }}</span>
+              </div>
+            </div>
+          </div>
+        {% else %}
+          <div class="rounded-2xl border border-dashed border-outline-variant bg-surface-container-lowest p-8 text-center">
+            <span class="material-symbols-outlined text-primary text-4xl">qr_code</span>
+            <p class="text-sm text-on-surface-variant mt-3">No QR code has been generated yet.</p>
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="rounded-[2rem] border border-outline-variant/40 bg-white p-6 md:p-8 shadow-soft">
+        <h3 class="text-lg font-semibold text-primary mb-5">Verification Status</h3>
+        <div class="space-y-3 text-sm">
+          <div class="flex items-center justify-between rounded-xl bg-surface-container-low p-4">
+            <span class="text-on-surface-variant">Status</span>
+            <span class="font-semibold text-on-surface">{{ vehicle.get_verification_status_display }}</span>
+          </div>
+          <div class="flex items-center justify-between rounded-xl bg-surface-container-low p-4">
+            <span class="text-on-surface-variant">Active</span>
+            <span class="font-semibold text-on-surface">{{ vehicle.is_active|yesno:"Yes,No" }}</span>
+          </div>
+          {% if vehicle.approved_at %}
+            <div class="flex items-center justify-between rounded-xl bg-surface-container-low p-4">
+              <span class="text-on-surface-variant">Approved On</span>
+              <span class="font-semibold text-on-surface">{{ vehicle.approved_at|date:"M d, Y H:i" }}</span>
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6">
+          <form method="post" action="{% url 'admin_vehicle_action' vehicle.uuid %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="approve" />
+            <button type="submit" class="w-full rounded-xl bg-green-600 px-4 py-3 text-white font-semibold hover:bg-green-700 transition active:scale-[0.98]">Approve Vehicle</button>
+          </form>
+          <form method="post" action="{% url 'admin_vehicle_action' vehicle.uuid %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="reject" />
+            <button type="submit" class="w-full rounded-xl bg-red-600 px-4 py-3 text-white font-semibold hover:bg-red-700 transition active:scale-[0.98]">Reject Vehicle</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

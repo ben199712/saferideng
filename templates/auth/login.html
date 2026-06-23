@@ -1,0 +1,55 @@
+{% extends "layouts/base.html" %}
+{% block title %}Login • SafeRide NG{% endblock %}
+{% block content %}
+<div class="max-w-xl mx-auto">
+  <div class="grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] gap-6 items-stretch">
+    <div class="hidden lg:flex rounded-[2rem] bg-[#2563EB] text-white p-8 shadow-elevated relative overflow-hidden">
+      <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.22),transparent_35%)]"></div>
+      <div class="relative z-10 flex flex-col justify-between w-full">
+        <div>
+          <div class="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center mb-8">
+            <span class="material-symbols-outlined text-3xl">verified_user</span>
+          </div>
+          <h1 class="text-3xl font-bold tracking-[-0.02em] leading-tight">Welcome back</h1>
+          <p class="text-white/80 mt-3 text-sm leading-6">Sign in to manage driver profiles, vehicle approvals, and verification records.</p>
+        </div>
+        <div class="space-y-3 text-sm text-white/80">
+          <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[18px]">check_circle</span> Secure role-based access</div>
+          <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[18px]">qr_code</span> QR-backed vehicle checks</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-[2rem] border border-outline-variant/40 bg-white p-6 md:p-8 shadow-soft">
+      <div class="mb-6">
+        <h2 class="text-3xl font-bold text-primary tracking-[-0.02em]">Sign in</h2>
+        <p class="text-sm text-on-surface-variant mt-2">Access your SafeRide NG dashboard.</p>
+      </div>
+
+      <form method="post" class="space-y-5">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        {% include "partials/form_field.html" with field=form.username label="Email" wrapper_class="" %}
+        {% include "partials/form_field.html" with field=form.password label="Password" wrapper_class="" %}
+
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <label class="flex items-center gap-2 text-sm text-on-surface-variant">
+            {{ form.remember_me }}
+            <span>Remember me</span>
+          </label>
+          <a href="{% url 'forgot_password' %}" class="text-sm font-semibold text-primary hover:text-[#1d4ed8]">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="w-full inline-flex items-center justify-center rounded-xl bg-[#2563EB] px-5 py-3 text-white font-semibold shadow-sm hover:bg-[#1d4ed8] hover:shadow-md transition active:scale-[0.98]">
+          Sign in
+        </button>
+      </form>
+
+      <div class="mt-6 text-sm text-center text-on-surface-variant">
+        Don’t have an account?
+        <a href="{% url 'register' %}" class="font-semibold text-primary hover:text-[#1d4ed8]">Register</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

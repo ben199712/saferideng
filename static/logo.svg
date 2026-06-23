@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="SafeRide NG logo">
+  <rect width="96" height="96" rx="24" fill="#001e40"/>
+  <path d="M28 48 42 62 68 34" fill="none" stroke="#a7c8ff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="30" cy="30" r="6" fill="#a0f399"/>
+  <circle cx="66" cy="66" r="6" fill="#a0f399"/>
+</svg>
