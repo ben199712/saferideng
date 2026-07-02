@@ -8,7 +8,7 @@ class Command(BaseCommand):
     help = "Regenerate QR codes for all approved vehicles using absolute public profile URLs"
 
     def add_arguments(self, parser):
-        parser.add_argument("--domain", type=str, required=True, help="Base domain, e.g. https://saferideng-production.up.railway.app")
+        parser.add_argument("--domain", type=str, required=True, help="Base domain, e.g. https://rideguardeng-production.up.railway.app")
 
     def handle(self, *args, **options):
         domain = options["domain"].rstrip("/")

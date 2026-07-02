@@ -69,14 +69,14 @@ class ForgotPasswordView(PasswordResetView):
     success_url = reverse_lazy("password_reset_done")
 
 
-class SafeRidePasswordResetDoneView(DjangoPasswordResetDoneView):
+class RideGuardePasswordResetDoneView(DjangoPasswordResetDoneView):
     template_name = "auth/password_reset_done.html"
 
 
-class SafeRidePasswordResetConfirmView(DjangoPasswordResetConfirmView):
+class RideGuardePasswordResetConfirmView(DjangoPasswordResetConfirmView):
     template_name = "auth/password_reset_confirm.html"
     success_url = reverse_lazy("password_reset_complete")
 
 
-class SafeRidePasswordResetCompleteView(DjangoPasswordResetCompleteView):
+class RideGuardePasswordResetCompleteView(DjangoPasswordResetCompleteView):
     template_name = "auth/password_reset_complete.html"

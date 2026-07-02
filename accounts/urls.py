@@ -5,9 +5,9 @@ from .views import (
     LoginView,
     LogoutView,
     RegisterView,
-    SafeRidePasswordResetCompleteView,
-    SafeRidePasswordResetConfirmView,
-    SafeRidePasswordResetDoneView,
+    RideGuardePasswordResetCompleteView,
+    RideGuardePasswordResetConfirmView,
+    RideGuardePasswordResetDoneView,
 )
 
 urlpatterns = [
@@ -15,7 +15,7 @@ urlpatterns = [
     path("logout/", LogoutView.as_view(), name="logout"),
     path("register/", RegisterView.as_view(), name="register"),
     path("forgot-password/", ForgotPasswordView.as_view(), name="forgot_password"),
-    path("password-reset/done/", SafeRidePasswordResetDoneView.as_view(), name="password_reset_done"),
-    path("reset/<uidb64>/<token>/", SafeRidePasswordResetConfirmView.as_view(), name="password_reset_confirm"),
-    path("reset/done/", SafeRidePasswordResetCompleteView.as_view(), name="password_reset_complete"),
+    path("password-reset/done/", RideGuardePasswordResetDoneView.as_view(), name="password_reset_done"),
+    path("reset/<uidb64>/<token>/", RideGuardePasswordResetConfirmView.as_view(), name="password_reset_confirm"),
+    path("reset/done/", RideGuardePasswordResetCompleteView.as_view(), name="password_reset_complete"),
 ]
