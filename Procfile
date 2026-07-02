@@ -1,1 +1,1 @@
-web: gunicorn rideguarde.wsgi
+web: gunicorn saferide.wsgi

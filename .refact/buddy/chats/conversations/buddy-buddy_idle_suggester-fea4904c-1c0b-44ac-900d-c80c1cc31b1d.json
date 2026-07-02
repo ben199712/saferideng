@@ -1,0 +1,102 @@
+{
+  "id": "buddy-buddy_idle_suggester-fea4904c-1c0b-44ac-900d-c80c1cc31b1d",
+  "title": "Idle Suggester",
+  "model": "google_gemini/gemini-2.5-flash",
+  "mode": "buddy",
+  "tool_use": "cat,search_pattern,buddy_speak,buddy_runtime_event",
+  "messages": [
+    {
+      "role": "system",
+      "content": "%BUDDY_PERSONALITY%\nThe user has been idle briefly while local changes exist. Keep this tiny and useful:\n1. Inspect only enough context to identify one safe next action.\n2. Use buddy_speak intent=insight for a short nudge.\n3. End with buddy_runtime_event titled \"Idle suggestion\" with what you suggested.\n"
+    },
+    {
+      "role": "user",
+      "content": "Workflow: buddy_idle_suggester\nProject root: C:\\Users\\HP\\Documents\\startup\\saferide\nEvidence:\nproject_root=[REDACTED_PATH]\nlast_activity_at=2026-07-02T05:20:42.432069500+00:00\nidle_minutes=15\nuncommitted_changes=true\n"
+    },
+    {
+      "message_id": "2fb7c3df-3ddc-4b47-9460-bbbf5c4f4c02",
+      "role": "assistant",
+      "content": "",
+      "finish_reason": "tool_calls",
+      "tool_calls": [
+        {
+          "id": "function-call-12014841241699170136",
+          "index": 0,
+          "function": {
+            "arguments": "{\"mood\":\"curious\",\"intent\":\"insight\",\"text\":\"It looks like there are uncommitted changes. Would you like to review them?\"}",
+            "name": "buddy_speak"
+          },
+          "type": "function"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 828,
+        "completion_tokens": 41,
+        "total_tokens": 869
+      }
+    },
+    {
+      "message_id": "cc4011a8-896e-4aa9-add1-f117da0b6fe2",
+      "role": "tool",
+      "content": "Spoke: It looks like there are uncommitted changes. Would you like to review them?",
+      "tool_call_id": "function-call-12014841241699170136",
+      "tool_failed": false
+    },
+    {
+      "message_id": "d9ac3fcd-3e29-4c38-a4d8-d6409a0dc5b2",
+      "role": "assistant",
+      "content": "",
+      "finish_reason": "tool_calls",
+      "tool_calls": [
+        {
+          "id": "function-call-13264392617924609188",
+          "index": 0,
+          "function": {
+            "arguments": "{\"status\":\"completed\",\"description\":\"Suggested reviewing uncommitted changes.\",\"title\":\"Idle suggestion\"}",
+            "name": "buddy_runtime_event"
+          },
+          "type": "function"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 903,
+        "completion_tokens": 32,
+        "total_tokens": 935
+      }
+    },
+    {
+      "message_id": "ad547067-dd70-4fca-a865-af5ab77aab22",
+      "role": "tool",
+      "content": "Runtime event enqueued: Idle suggestion",
+      "tool_call_id": "function-call-13264392617924609188",
+      "tool_failed": false
+    },
+    {
+      "message_id": "f6791bad-d8c1-450e-bdc1-9c0712b8f2ce",
+      "role": "assistant",
+      "content": "It looks like there are uncommitted changes. Would you like to review them?",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 959,
+        "completion_tokens": 16,
+        "total_tokens": 975
+      }
+    }
+  ],
+  "created_at": "2026-07-02T05:36:32.396936500+00:00",
+  "boost_reasoning": false,
+  "checkpoints_enabled": true,
+  "context_tokens_cap": null,
+  "include_project_info": true,
+  "isTitleGenerated": false,
+  "auto_approve_editing_tools": false,
+  "auto_approve_dangerous_commands": false,
+  "autonomous_no_confirm": true,
+  "buddy_meta": {
+    "is_buddy_chat": true,
+    "buddy_chat_kind": "system",
+    "workflow_id": "buddy_idle_suggester"
+  },
+  "root_chat_id": "buddy-buddy_idle_suggester-fea4904c-1c0b-44ac-900d-c80c1cc31b1d",
+  "updated_at": "2026-07-02T05:36:32.400983400+00:00"
+}
