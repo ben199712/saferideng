@@ -1,4 +1,5 @@
 from django import forms
+from django.forms.widgets import TextInput
 
 from .models import EmergencyContact
 
@@ -8,9 +9,9 @@ class EmergencyContactForm(forms.ModelForm):
         model = EmergencyContact
         fields = ["full_name", "phone_number", "relationship"]
         widgets = {
-            "full_name": forms.TextInput(attrs={"class": "w-full", "autocomplete": "name"}),
-            "phone_number": forms.TelInput(attrs={"class": "w-full", "autocomplete": "tel"}),
-            "relationship": forms.TextInput(attrs={"class": "w-full", "placeholder": "Family, Friend, Colleague"}),
+            "full_name": TextInput(attrs={"class": "w-full", "autocomplete": "name"}),
+            "phone_number": TextInput(attrs={"class": "w-full", "autocomplete": "tel", "type": "tel"}),
+            "relationship": TextInput(attrs={"class": "w-full", "placeholder": "Family, Friend, Colleague"}),
         }
 
     def clean_full_name(self):
