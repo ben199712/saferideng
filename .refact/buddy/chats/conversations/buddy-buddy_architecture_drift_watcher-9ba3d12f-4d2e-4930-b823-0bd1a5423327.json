@@ -1,0 +1,83 @@
+{
+  "id": "buddy-buddy_architecture_drift_watcher-9ba3d12f-4d2e-4930-b823-0bd1a5423327",
+  "title": "Architecture Drift Watcher",
+  "model": "google_gemini/gemini-2.5-flash",
+  "mode": "buddy",
+  "tool_use": "cat,tree,search_pattern,search_symbol_definition,buddy_runtime_event,buddy_memory_create",
+  "messages": [
+    {
+      "role": "system",
+      "content": "%BUDDY_PERSONALITY%\n\nYou watch for meaningful architecture drift between code, docs, and memories.\nRecord only useful architectural observations that will help future work.\nPrefer concise memory creation over noisy reports.\n\nSteps:\n1. Inspect the provided evidence, project tree, and relevant definitions.\n2. Compare observed structure with docs or remembered expectations.\n3. Create a memory only for stable, reusable architecture facts.\n4. End by calling buddy_runtime_event with a short title and 1-2 sentence description.\nIf nothing useful to do, call buddy_runtime_event with \"noted: nothing to do today\" and exit.\n"
+    },
+    {
+      "role": "user",
+      "content": "Workflow: buddy_architecture_drift_watcher\nTitle: Architecture Drift Watcher\nSignal hash: 47797b9171d8d50b688c18aa6445b9b9f9352f1c6af645c2a6b1cd70d79a5759\nPriority: normal\n\nTask:\nReview the local architecture drift signal. Summarize subsystem concentration or cross-cutting risk, and propose lightweight guardrails. Use only path groups and diff stats.\n\nEvidence:\nArchitecture drift signal:\n- changed_file_count: 1\n- additions: 3012\n- deletions: 1420\n- path_groups:\n  - accounts: 1 files\n"
+    },
+    {
+      "message_id": "b24a27fc-61f0-4e86-bdcc-a86b135f9205",
+      "role": "assistant",
+      "content": "",
+      "finish_reason": "tool_calls",
+      "tool_calls": [
+        {
+          "id": "function-call-14256679727451735508",
+          "index": 0,
+          "function": {
+            "arguments": "{\"description\":\"Reviewed local architecture drift signal. Summarized subsystem concentration/cross-cutting risk and proposed lightweight guardrails.\",\"title\":\"Architecture Drift Watcher\",\"status\":\"completed\"}",
+            "name": "buddy_runtime_event"
+          },
+          "type": "function"
+        },
+        {
+          "id": "function-call-14256679727451736519",
+          "index": 1,
+          "function": {
+            "arguments": "{\"source_id\":\"47797b9171d8d50b688c18aa6445b9b9f9352f1c6af645c2a6b1cd70d79a5759\",\"title\":\"Monitor Large Single-File Churn in Core Domains\",\"tags\":[\"architecture\",\"drift\",\"refactoring\",\"god_object\",\"coupling\",\"accounts\"],\"content\":\"Large single-file changes, particularly within core domain path groups like 'accounts', can be an early indicator of a 'god object' or a highly coupled component. Consistent high churn (additions/deletions) in a single file might suggest that its responsibilities are expanding excessively and could benefit from refactoring into smaller, more focused modules to prevent future architectural fragility.\",\"kind\":\"insight\"}",
+            "name": "buddy_memory_create"
+          },
+          "type": "function"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1201,
+        "completion_tokens": 249,
+        "total_tokens": 1450
+      }
+    },
+    {
+      "message_id": "faab58cb-316b-4ecb-a14c-d97986d136c4",
+      "role": "tool",
+      "content": "Runtime event enqueued: Architecture Drift Watcher",
+      "tool_call_id": "function-call-14256679727451735508",
+      "tool_failed": false
+    },
+    {
+      "message_id": "f4168d36-87b0-4b93-8137-3f5b25626339",
+      "role": "tool",
+      "content": "Created memory: C:\\Users\\HP\\Documents\\startup\\saferide\\.refact/knowledge\\2026-07-02_054257_a9913567_large-singlefile-changes-particularly-within.md",
+      "tool_call_id": "function-call-14256679727451736519",
+      "tool_failed": false
+    },
+    {
+      "message_id": "e12797f1-0233-4f6c-8a0e-7500ff40aa7e",
+      "role": "assistant",
+      "content": ""
+    }
+  ],
+  "created_at": "2026-07-02T04:43:02.757387900+00:00",
+  "boost_reasoning": false,
+  "checkpoints_enabled": true,
+  "context_tokens_cap": null,
+  "include_project_info": true,
+  "isTitleGenerated": false,
+  "auto_approve_editing_tools": false,
+  "auto_approve_dangerous_commands": false,
+  "autonomous_no_confirm": true,
+  "buddy_meta": {
+    "is_buddy_chat": true,
+    "buddy_chat_kind": "system",
+    "workflow_id": "buddy_architecture_drift_watcher"
+  },
+  "root_chat_id": "buddy-buddy_architecture_drift_watcher-9ba3d12f-4d2e-4930-b823-0bd1a5423327",
+  "updated_at": "2026-07-02T04:43:02.760221100+00:00"
+}

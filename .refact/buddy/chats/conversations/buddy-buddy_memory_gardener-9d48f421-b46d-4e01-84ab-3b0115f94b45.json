@@ -1,0 +1,67 @@
+{
+  "id": "buddy-buddy_memory_gardener-9d48f421-b46d-4e01-84ab-3b0115f94b45",
+  "title": "Memory Gardener",
+  "model": "google_gemini/gemini-2.5-flash",
+  "mode": "buddy",
+  "tool_use": "buddy_memory_search,buddy_memory_create,buddy_memory_archive,buddy_memory_retag,buddy_memory_merge,buddy_runtime_event",
+  "messages": [
+    {
+      "role": "system",
+      "content": "%BUDDY_PERSONALITY%\n\nYou keep the memory garden tidy and useful for future agents.\nFavor deduplication, clear tags, and compact notes over creating more clutter.\nOnly mutate memories when the reason is explicit in the evidence.\n\nSteps:\n1. Search relevant memories using the task and evidence.\n2. Decide whether to create, archive, retag, or merge records.\n3. Apply the smallest useful memory maintenance action.\n4. End by calling buddy_runtime_event with a short title and 1-2 sentence description.\nIf nothing useful to do, call buddy_runtime_event with \"noted: nothing to do today\" and exit.\n"
+    },
+    {
+      "role": "user",
+      "content": "Workflow: buddy_memory_gardener\nTitle: Memory Gardener\nSignal hash: a6170eda5a3e2f98b5a60439f8c70b2da03aba8dd4b14cc3d9a2df625fec4a9f\nPriority: normal\n\nTask:\nReview memory garden signals and recommend safe cleanup, consolidation, or follow-up. Use only the metadata in evidence; do not assume full memory contents.\n\nEvidence:\nmemory_pulse total=1 orphan=1\nmemory_orphan key=memory:orphan:batch:75926d95be00cebc source=memory_garden confidence=0.55; count=1; memory_ids=d9c9f2db-9cd7-4a06-ac71-eaaa22d379aa\n"
+    },
+    {
+      "message_id": "3a5ccf3a-a148-4028-9444-783d2ab3bd1f",
+      "role": "assistant",
+      "content": "",
+      "finish_reason": "tool_calls",
+      "tool_calls": [
+        {
+          "id": "function-call-15843874651611319527",
+          "index": 0,
+          "function": {
+            "arguments": "{\"title\":\"noted: nothing to do today\",\"status\":\"completed\"}",
+            "name": "buddy_runtime_event"
+          },
+          "type": "function"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1003,
+        "completion_tokens": 28,
+        "total_tokens": 1031
+      }
+    },
+    {
+      "message_id": "d7316891-7198-4245-bb84-2ace7527bad8",
+      "role": "tool",
+      "content": "Runtime event enqueued: noted: nothing to do today",
+      "tool_call_id": "function-call-15843874651611319527",
+      "tool_failed": false
+    },
+    {
+      "message_id": "ba409adb-18d7-4110-b163-7fd526685808",
+      "role": "assistant",
+      "content": ""
+    }
+  ],
+  "created_at": "2026-06-30T11:17:19.980817700+00:00",
+  "boost_reasoning": false,
+  "checkpoints_enabled": true,
+  "context_tokens_cap": null,
+  "include_project_info": true,
+  "isTitleGenerated": false,
+  "auto_approve_editing_tools": false,
+  "auto_approve_dangerous_commands": false,
+  "autonomous_no_confirm": true,
+  "buddy_meta": {
+    "is_buddy_chat": true,
+    "buddy_chat_kind": "system",
+    "workflow_id": "buddy_memory_gardener"
+  },
+  "root_chat_id": "buddy-buddy_memory_gardener-9d48f421-b46d-4e01-84ab-3b0115f94b45",
+  "updated_at": "2026-06-30T11:17:19.984596400+00:00"
+}

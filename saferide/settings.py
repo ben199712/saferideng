@@ -26,9 +26,9 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "django-insecure-o*!8yr$2xp@^t&
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DJANGO_DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = [".localhost", "127.0.0.1", "[::1]", "testserver", ".railway.app"]
+ALLOWED_HOSTS = [".localhost", "127.0.0.1", "[::1]", "testserver", ".railway.app", ".ridegaurde.com", "ridegaurde.com"]
 
-CSRF_TRUSTED_ORIGINS = ["https://*.up.railway.app", "https://saferideng-production.up.railway.app"]
+CSRF_TRUSTED_ORIGINS = ["https://*.up.railway.app", "https://saferideng-production.up.railway.app", "https://ridegaurde.com", "https://*.ridegaurde.com"]
 
 
 # Application definition
@@ -125,8 +125,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 

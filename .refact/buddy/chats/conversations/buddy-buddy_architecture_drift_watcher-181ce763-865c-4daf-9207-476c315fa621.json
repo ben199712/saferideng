@@ -1,0 +1,73 @@
+{
+  "id": "buddy-buddy_architecture_drift_watcher-181ce763-865c-4daf-9207-476c315fa621",
+  "title": "Architecture Drift Watcher",
+  "model": "google_gemini/gemini-2.5-flash",
+  "mode": "buddy",
+  "tool_use": "cat,tree,search_pattern,search_symbol_definition,buddy_runtime_event,buddy_memory_create",
+  "messages": [
+    {
+      "role": "system",
+      "content": "%BUDDY_PERSONALITY%\n\nYou watch for meaningful architecture drift between code, docs, and memories.\nRecord only useful architectural observations that will help future work.\nPrefer concise memory creation over noisy reports.\n\nSteps:\n1. Inspect the provided evidence, project tree, and relevant definitions.\n2. Compare observed structure with docs or remembered expectations.\n3. Create a memory only for stable, reusable architecture facts.\n4. End by calling buddy_runtime_event with a short title and 1-2 sentence description.\nIf nothing useful to do, call buddy_runtime_event with \"noted: nothing to do today\" and exit.\n"
+    },
+    {
+      "role": "user",
+      "content": "Workflow: buddy_architecture_drift_watcher\nTitle: Architecture Drift Watcher\nSignal hash: f91750ce27f814c9dbf2dcacf4944355122ae81b39a1d3eab452adddcf1aa17f\nPriority: normal\n\nTask:\nReview the local architecture drift signal. Summarize subsystem concentration or cross-cutting risk, and propose lightweight guardrails. Use only path groups and diff stats.\n\nEvidence:\nArchitecture drift signal:\n- changed_file_count: 0\n- additions: 2029\n- deletions: 1419\n- path_groups:\n"
+    },
+    {
+      "message_id": "db856f52-7529-4198-936d-2659c4c8b9b9",
+      "role": "assistant",
+      "content": "",
+      "finish_reason": "tool_calls",
+      "tool_calls": [
+        {
+          "id": "function-call-1143429749015334987",
+          "index": 0,
+          "function": {
+            "arguments": "{\"title\":\"noted: nothing to do today\",\"status\":\"completed\",\"description\":\"No useful architecture drift information provided. The `path_groups` list is empty, and `changed_file_count` is 0 while `additions` and `deletions` are non-zero, making the evidence contradictory and incomplete for architectural analysis.\"}",
+            "name": "buddy_runtime_event"
+          },
+          "type": "function"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1184,
+        "completion_tokens": 85,
+        "total_tokens": 1269
+      }
+    },
+    {
+      "message_id": "3403e588-8bec-4037-98d7-9663d4f2554f",
+      "role": "tool",
+      "content": "Runtime event enqueued: noted: nothing to do today",
+      "tool_call_id": "function-call-1143429749015334987",
+      "tool_failed": false
+    },
+    {
+      "message_id": "cf644d84-4527-498f-8836-10e443238543",
+      "role": "assistant",
+      "content": "No useful architecture drift information provided. The `path_groups` list is empty, and `changed_file_count` is 0 while `additions` and `deletions` are non-zero, making the evidence contradictory and incomplete for architectural analysis.",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 1297,
+        "completion_tokens": 54,
+        "total_tokens": 1351
+      }
+    }
+  ],
+  "created_at": "2026-06-30T11:15:08.745585200+00:00",
+  "boost_reasoning": false,
+  "checkpoints_enabled": true,
+  "context_tokens_cap": null,
+  "include_project_info": true,
+  "isTitleGenerated": false,
+  "auto_approve_editing_tools": false,
+  "auto_approve_dangerous_commands": false,
+  "autonomous_no_confirm": true,
+  "buddy_meta": {
+    "is_buddy_chat": true,
+    "buddy_chat_kind": "system",
+    "workflow_id": "buddy_architecture_drift_watcher"
+  },
+  "root_chat_id": "buddy-buddy_architecture_drift_watcher-181ce763-865c-4daf-9207-476c315fa621",
+  "updated_at": "2026-06-30T11:15:08.806644800+00:00"
+}

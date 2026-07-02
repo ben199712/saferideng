@@ -1,0 +1,44 @@
+{
+  "id": "buddy-buddy_memory_gardener-f835043a-8fe6-4031-b34d-82783ab24c89",
+  "title": "Memory Gardener",
+  "model": "google_gemini/gemini-2.5-flash",
+  "mode": "buddy",
+  "tool_use": "buddy_memory_search,buddy_memory_create,buddy_memory_archive,buddy_memory_retag,buddy_memory_merge,buddy_runtime_event",
+  "messages": [
+    {
+      "role": "system",
+      "content": "%BUDDY_PERSONALITY%\n\nYou keep the memory garden tidy and useful for future agents.\nFavor deduplication, clear tags, and compact notes over creating more clutter.\nOnly mutate memories when the reason is explicit in the evidence.\n\nSteps:\n1. Search relevant memories using the task and evidence.\n2. Decide whether to create, archive, retag, or merge records.\n3. Apply the smallest useful memory maintenance action.\n4. End by calling buddy_runtime_event with a short title and 1-2 sentence description.\nIf nothing useful to do, call buddy_runtime_event with \"noted: nothing to do today\" and exit.\n"
+    },
+    {
+      "role": "user",
+      "content": "Workflow: buddy_memory_gardener\nTitle: Memory Gardener\nSignal hash: 8e092bf43ff70cccf3df047871d62e29919d548903a11e423f224a7deea65342\nPriority: normal\n\nTask:\nReview memory garden signals and recommend safe cleanup, consolidation, or follow-up. Use only the metadata in evidence; do not assume full memory contents.\n\nEvidence:\nmemory_pulse total=3 orphan=1\nmemory_orphan key=memory:orphan:batch:75926d95be00cebc source=memory_garden confidence=0.55; count=1; memory_ids=d9c9f2db-9cd7-4a06-ac71-eaaa22d379aa\n"
+    },
+    {
+      "message_id": "e557235b-fadd-4b16-b11a-61d7aac57fe2",
+      "role": "assistant",
+      "content": "",
+      "finish_reason": "function_call_filter: MALFORMED_FUNCTION_CALL",
+      "usage": {
+        "prompt_tokens": 1006,
+        "completion_tokens": 0,
+        "total_tokens": 1006
+      }
+    }
+  ],
+  "created_at": "2026-07-02T04:44:23.246990900+00:00",
+  "boost_reasoning": false,
+  "checkpoints_enabled": true,
+  "context_tokens_cap": null,
+  "include_project_info": true,
+  "isTitleGenerated": false,
+  "auto_approve_editing_tools": false,
+  "auto_approve_dangerous_commands": false,
+  "autonomous_no_confirm": true,
+  "buddy_meta": {
+    "is_buddy_chat": true,
+    "buddy_chat_kind": "system",
+    "workflow_id": "buddy_memory_gardener"
+  },
+  "root_chat_id": "buddy-buddy_memory_gardener-f835043a-8fe6-4031-b34d-82783ab24c89",
+  "updated_at": "2026-07-02T04:44:23.252847600+00:00"
+}
