@@ -7,6 +7,10 @@ import uuid
 class UserManager(BaseUserManager):
     use_in_migrations = True
 
+    def get_by_natural_key(self, email):
+        email = (email or "").strip()
+        return self.get(**{f"{self.model.USERNAME_FIELD}__iexact": email})
+
     def _create_user(self, email, password, **extra_fields):
         if not email:
             raise ValueError("The Email must be set")

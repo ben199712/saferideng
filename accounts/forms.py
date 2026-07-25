@@ -19,6 +19,9 @@ class LoginForm(AuthenticationForm):
         widget=forms.CheckboxInput(attrs={"class": "h-4 w-4"}),
     )
 
+    def clean_username(self):
+        return self.cleaned_data["username"].strip().lower()
+
 
 class RegisterForm(forms.ModelForm):
     first_name = forms.CharField(

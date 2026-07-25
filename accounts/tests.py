@@ -57,6 +57,48 @@ class AuthViewTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("dashboard_home"))
 
+    def test_login_accepts_uppercase_email(self):
+        user = User.objects.create_user(
+            email="drivercase@example.com",
+            password="password123",
+            first_name="Driver",
+            last_name="Case",
+            phone_number="+2348000000010",
+        )
+        client = Client()
+
+        response = client.post(
+            reverse("login"),
+            {
+                "username": "DRIVERCASE@EXAMPLE.COM",
+                "password": "password123",
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("driver_profile"))
+
+    def test_login_strips_email_whitespace(self):
+        user = User.objects.create_user(
+            email="drivertrim@example.com",
+            password="password123",
+            first_name="Driver",
+            last_name="Trim",
+            phone_number="+2348000000011",
+        )
+        client = Client()
+
+        response = client.post(
+            reverse("login"),
+            {
+                "username": "  drivertrim@example.com  ",
+                "password": "password123",
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("driver_profile"))
+
     def test_create_superuser_is_staff_for_admin_login(self):
         user = User.objects.create_superuser(
             email="NewAdmin@example.com",
