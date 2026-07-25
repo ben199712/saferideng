@@ -39,6 +39,19 @@ class DriverProfileViewTests(TestCase):
         self.assertEqual(profile.verification_status, DriverProfile.VerificationStatus.pending)
         self.assertFalse(profile.is_approved)
 
+    def test_driver_register_page_loads(self):
+        response = self.client.get(reverse("driver_register"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Driver Registration")
+        self.assertContains(response, "License Number")
+
+    def test_driver_profile_update_link_points_to_register_route(self):
+        response = self.client.get(reverse("driver_profile"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'href="/drivers/register/"')
+
     def test_driver_can_update_existing_profile(self):
         DriverProfile.objects.create(
             user=self.user,
