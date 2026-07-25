@@ -13,7 +13,7 @@ def build_trip_url(request, uuid):
 
 
 def build_share_trip_url(request, uuid):
-    return request.build_absolute_uri(reverse("trip_share", kwargs={"uuid": str(uuid)}))
+    return request.build_absolute_uri(reverse("trip_detail", kwargs={"uuid": str(uuid)}))
 
 
 def build_trip_share_message(request, trip):
