@@ -1,4 +1,6 @@
 import json
+from urllib.parse import parse_qs
+
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from .models import TripShare, LocationUpdate
@@ -8,18 +10,20 @@ class LocationTrackingConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.trip_share_id = self.scope['url_route']['kwargs']['trip_share_id']
         self.trip_share_group = f'trip_share_{self.trip_share_id}'
+        query_params = parse_qs(self.scope.get("query_string", b"").decode())
+        self.viewer_secret = query_params.get("secret", [""])[0]
+        self.broadcaster_token = query_params.get("broadcaster", [""])[0]
 
         user = self.scope['user']
-        if not user.is_authenticated:
-            await self.close()
-            return
-
         self.trip_share = await database_sync_to_async(self.get_trip_share)(self.trip_share_id)
         if not self.trip_share or self.trip_share.status != TripShare.Status.ACTIVE:
             await self.close()
             return
 
-        if not await database_sync_to_async(self.is_authorized)(user):
+        permissions = await database_sync_to_async(self.resolve_permissions)(user)
+        self.can_view = permissions["can_view"]
+        self.can_broadcast = permissions["can_broadcast"]
+        if not self.can_view:
             await self.close()
             return
 
@@ -36,7 +40,7 @@ class LocationTrackingConsumer(AsyncWebsocketConsumer):
             await self.handle_location_update(data)
 
     async def handle_location_update(self, data):
-        if self.scope['user'].id != self.trip_share.sharer.id:
+        if not self.can_broadcast:
             return
         location = await database_sync_to_async(LocationUpdate.objects.create)(
             trip_share=self.trip_share,
@@ -72,5 +76,12 @@ class LocationTrackingConsumer(AsyncWebsocketConsumer):
         except TripShare.DoesNotExist:
             return None
 
-    def is_authorized(self, user):
-        return user.id == self.trip_share.sharer.id or (self.trip_share.receiver and user.id == self.trip_share.receiver.id)
+    def resolve_permissions(self, user):
+        is_authenticated_sharer = user.is_authenticated and user.id == self.trip_share.sharer.id
+        is_authenticated_receiver = user.is_authenticated and self.trip_share.receiver and user.id == self.trip_share.receiver.id
+        is_secret_viewer = self.viewer_secret == str(self.trip_share.share_secret)
+        is_broadcaster = self.broadcaster_token == str(self.trip_share.broadcaster_token)
+        return {
+            "can_view": bool(is_authenticated_sharer or is_authenticated_receiver or is_secret_viewer or is_broadcaster),
+            "can_broadcast": bool(is_authenticated_sharer or is_broadcaster),
+        }

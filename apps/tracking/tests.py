@@ -28,6 +28,7 @@ class TrackingTestMixin:
             vehicle_make="Toyota",
             vehicle_model="Corolla",
             vehicle_color="Blue",
+            vin=f"VIN-{driver.id}",
             year=2022,
             registered_route="Campus Gate - City Center",
             insurance_number=f"INS-{driver.id}",
@@ -105,6 +106,8 @@ class TrackingViewTests(TrackingTestMixin, TestCase):
         self.assertIn("/ws/tracking/", content)
         self.assertIn("playback-slider", content)
         self.assertIn("Toggle Geofence", content)
+        self.assertIn("Verified Driver ID", content)
+        self.assertIn("VIN", content)
 
     def test_unauthorized_user_gets_permission_denied(self):
         share = TripShare.objects.create(trip=self.trip, sharer=self.driver, receiver=self.receiver)
@@ -113,6 +116,26 @@ class TrackingViewTests(TrackingTestMixin, TestCase):
         response = self.client.get(reverse("tracking:view", kwargs={"share_id": share.id}))
 
         self.assertEqual(response.status_code, 403)
+
+    def test_public_secret_link_can_view_live_tracking_page(self):
+        share = TripShare.objects.create(trip=self.trip, sharer=self.driver, receiver=None)
+        LocationUpdate.objects.create(
+            trip_share=share,
+            latitude=9.123456,
+            longitude=7.654321,
+            accuracy=8.0,
+            speed=5.5,
+        )
+
+        response = self.client.get(
+            reverse("tracking:view", kwargs={"share_id": share.id}),
+            {"secret": str(share.share_secret)},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Live Trip Tracking")
+        self.assertContains(response, str(share.trip.driver.uuid))
+        self.assertContains(response, share.trip.vehicle.vin)
 
     def test_share_list_shows_user_related_shares(self):
         TripShare.objects.create(trip=self.trip, sharer=self.driver, receiver=self.receiver)
@@ -133,3 +156,4 @@ class TrackingViewTests(TrackingTestMixin, TestCase):
         self.assertContains(response, "xl:grid-cols-[380px_minmax(0,1fr)]")
         self.assertContains(response, "h-[420px] sm:h-[520px] lg:h-[680px]")
         self.assertContains(response, "preferCanvas")
+        self.assertContains(response, "setInterval(requestCurrentPosition, 10000)")

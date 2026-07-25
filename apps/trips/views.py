@@ -21,6 +21,7 @@ from .services import (
     build_trip_share_message,
     build_trip_url,
     create_trip_from_vehicle,
+    get_or_create_public_trip_share,
     open_report_count_for_trip,
     trigger_sos_alert,
 )
@@ -90,6 +91,8 @@ class TripStartView(View):
             destination=form.cleaned_data["destination"],
             start_location=form.cleaned_data["start_location"],
         )
+        share = get_or_create_public_trip_share(trip)
+        request.session[f"trip_broadcast_{trip.uuid}"] = str(share.broadcaster_token)
         messages.success(request, "Trip started. You can track and share it safely.")
         return redirect("trip_detail", uuid=trip.uuid)
 
@@ -99,6 +102,7 @@ class TripTrackingView(TripAccessMixin, View):
 
     def get(self, request, uuid):
         trip = self.get_trip(request, uuid)
+        share = get_or_create_public_trip_share(trip)
         active_alerts = trip.alerts.filter(status=EmergencyAlert.AlertStatus.active).order_by("-created_at")[:5]
         reports = trip.incident_reports.order_by("-created_at")[:5]
         emergency_contacts = []
@@ -106,6 +110,7 @@ class TripTrackingView(TripAccessMixin, View):
             emergency_contacts = list(
                 request.user.emergency_contacts.order_by("created_at")
             )
+        session_broadcaster_token = request.session.get(f"trip_broadcast_{trip.uuid}", "")
         return render(
             request,
             self.template_name,
@@ -116,6 +121,9 @@ class TripTrackingView(TripAccessMixin, View):
                 "emergency_contacts": emergency_contacts,
                 "share_url": build_share_trip_url(request, trip.uuid),
                 "tracking_url": build_trip_url(request, trip.uuid),
+                "tracking_share_id": str(share.id),
+                "tracking_secret": str(share.share_secret),
+                "tracking_broadcaster_token": session_broadcaster_token if session_broadcaster_token == str(share.broadcaster_token) else "",
                 "emergency_alert_count": active_alert_count_for_trip(trip),
                 "open_report_count": open_report_count_for_trip(trip),
             },

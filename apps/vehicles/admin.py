@@ -11,6 +11,7 @@ from .services import generate_qr_code
 class VehicleAdmin(admin.ModelAdmin):
     list_display = (
         "plate_number",
+        "vin",
         "driver",
         "vehicle_type",
         "registered_route",
@@ -19,7 +20,7 @@ class VehicleAdmin(admin.ModelAdmin):
         "created_at",
     )
     list_filter = ("vehicle_type", "verification_status", "is_active")
-    search_fields = ("plate_number", "driver__email", "driver__first_name", "driver__last_name")
+    search_fields = ("plate_number", "vin", "driver__email", "driver__first_name", "driver__last_name")
     readonly_fields = ("uuid", "approved_at", "created_at", "updated_at")
 
     def save_model(self, request, obj, form, change):

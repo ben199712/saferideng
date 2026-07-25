@@ -36,14 +36,27 @@
         <div class="text-xs font-semibold uppercase tracking-[0.04em] text-on-surface-variant mb-5">Tracking Overview</div>
         <div class="space-y-4">
           <div class="rounded-2xl bg-surface-container-low p-4">
-            <div class="text-xs uppercase tracking-[0.04em] text-on-surface-variant">Sharer</div>
-            <div class="mt-1 font-semibold text-on-surface">{{ trip_share.sharer.full_name|default:trip_share.sharer.email }}</div>
-            <div class="text-sm text-on-surface-variant">{{ trip_share.sharer.email }}</div>
+            <div class="text-xs uppercase tracking-[0.04em] text-on-surface-variant">Trip Entry Time</div>
+            <div class="mt-1 font-semibold text-on-surface">{{ trip_entry_time|date:"M d, Y h:i A" }}</div>
+            <div class="text-sm text-on-surface-variant">Exact time the passenger entered the vehicle.</div>
           </div>
           <div class="rounded-2xl bg-surface-container-low p-4">
             <div class="text-xs uppercase tracking-[0.04em] text-on-surface-variant">Trip Route</div>
             <div class="mt-1 text-sm text-on-surface"><span class="font-semibold">From:</span> {{ trip_share.trip.start_location }}</div>
             <div class="text-sm text-on-surface"><span class="font-semibold">To:</span> {{ trip_share.trip.destination }}</div>
+          </div>
+          <div class="rounded-2xl bg-surface-container-low p-4 space-y-2">
+            <div class="text-xs uppercase tracking-[0.04em] text-on-surface-variant">Driver Information</div>
+            <div class="font-semibold text-on-surface">{{ trip_share.trip.driver.full_name|default:trip_share.trip.driver.email }}</div>
+            <div class="text-sm text-on-surface-variant">Phone: {{ driver_contact_number }}</div>
+            <div class="text-sm text-on-surface-variant">Verified Driver ID: <span class="font-mono">{{ driver_verified_id }}</span></div>
+          </div>
+          <div class="rounded-2xl bg-surface-container-low p-4 space-y-2">
+            <div class="text-xs uppercase tracking-[0.04em] text-on-surface-variant">Vehicle Information</div>
+            <div class="text-sm text-on-surface"><span class="font-semibold">Plate:</span> {{ trip_share.trip.vehicle.plate_number }}</div>
+            <div class="text-sm text-on-surface"><span class="font-semibold">Model:</span> {{ trip_share.trip.vehicle.vehicle_make }} {{ trip_share.trip.vehicle.vehicle_model }}</div>
+            <div class="text-sm text-on-surface"><span class="font-semibold">Color:</span> {{ trip_share.trip.vehicle.vehicle_color }}</div>
+            <div class="text-sm text-on-surface"><span class="font-semibold">VIN:</span> {{ vehicle_vin }}</div>
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div class="rounded-2xl border border-outline-variant/30 p-4">
@@ -127,7 +140,7 @@
         </div>
       </div>
 
-      {% if is_sharer %}
+      {% if can_broadcast %}
         <div class="rounded-[2rem] border border-outline-variant/40 bg-white p-6 shadow-soft">
           <div class="text-xs font-semibold uppercase tracking-[0.04em] text-on-surface-variant mb-4">Broadcast Controls</div>
           <div class="space-y-3">
@@ -198,13 +211,23 @@
 <script>
   (() => {
     const historyPoints = JSON.parse(document.getElementById("tracking-history-data").textContent || "[]");
-    const isSharer = {% if is_sharer %}true{% else %}false{% endif %};
+    const canBroadcast = {% if can_broadcast %}true{% else %}false{% endif %};
     const tripShareId = "{{ trip_share.id }}";
+    const viewerSecret = "{{ viewer_secret|default:''|escapejs }}";
+    const broadcasterToken = "{{ broadcaster_token|default:''|escapejs }}";
     const geofenceRadius = {{ geofence_radius_meters|default:250 }};
     const defaultLat = historyPoints.length ? historyPoints[historyPoints.length - 1].latitude : 9.0820;
     const defaultLng = historyPoints.length ? historyPoints[historyPoints.length - 1].longitude : 8.6753;
     const wsProtocol = window.location.protocol === "https:" ? "wss://" : "ws://";
-    const wsUrl = `${wsProtocol}${window.location.host}/ws/tracking/${tripShareId}/`;
+    const wsParams = new URLSearchParams();
+    if (viewerSecret) {
+      wsParams.set("secret", viewerSecret);
+    }
+    if (broadcasterToken) {
+      wsParams.set("broadcaster", broadcasterToken);
+    }
+    const wsQuery = wsParams.toString();
+    const wsUrl = `${wsProtocol}${window.location.host}/ws/tracking/${tripShareId}/${wsQuery ? `?${wsQuery}` : ""}`;
 
     const connectionState = document.getElementById("connection-state");
     const gpsState = document.getElementById("gps-state");
@@ -269,7 +292,7 @@
     let socket = null;
     let reconnectAttempts = 0;
     let playbackTimer = null;
-    let geoWatchId = null;
+    let geoIntervalId = null;
     const outboundQueue = [];
 
     function setStatus(el, text, classes) {
@@ -457,14 +480,8 @@
       }
     }
 
-    function startSharing() {
-      if (!("geolocation" in navigator)) {
-        setStatus(gpsState, "Unsupported", "text-red-700");
-        return;
-      }
-      document.getElementById("start-sharing").classList.add("hidden");
-      document.getElementById("stop-sharing").classList.remove("hidden");
-      geoWatchId = navigator.geolocation.watchPosition(
+    function requestCurrentPosition() {
+      navigator.geolocation.getCurrentPosition(
         broadcastPosition,
         handleGeoError,
         {
@@ -475,10 +492,22 @@
       );
     }
 
+    function startSharing() {
+      if (!("geolocation" in navigator)) {
+        setStatus(gpsState, "Unsupported", "text-red-700");
+        return;
+      }
+      document.getElementById("start-sharing").classList.add("hidden");
+      document.getElementById("stop-sharing").classList.remove("hidden");
+      requestCurrentPosition();
+      geoIntervalId = window.setInterval(requestCurrentPosition, 10000);
+      setStatus(gpsState, "Broadcasting", "text-green-700");
+    }
+
     function stopSharing() {
-      if (geoWatchId !== null) {
-        navigator.geolocation.clearWatch(geoWatchId);
-        geoWatchId = null;
+      if (geoIntervalId !== null) {
+        window.clearInterval(geoIntervalId);
+        geoIntervalId = null;
       }
       document.getElementById("start-sharing").classList.remove("hidden");
       document.getElementById("stop-sharing").classList.add("hidden");
@@ -532,7 +561,7 @@
       }
     });
 
-    if (isSharer) {
+    if (canBroadcast) {
       document.getElementById("start-sharing").addEventListener("click", startSharing);
       document.getElementById("stop-sharing").addEventListener("click", stopSharing);
     }

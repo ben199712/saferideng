@@ -2,6 +2,7 @@ from django.test import Client, RequestFactory, TestCase, override_settings
 from django.urls import reverse
 
 from accounts.models import User
+from apps.tracking.models import TripShare
 from apps.trips.models import Trip
 from apps.trips.services import build_share_trip_url
 from apps.vehicles.models import Vehicle
@@ -41,19 +42,35 @@ class TripShareFlowTests(TestCase):
         self.factory = RequestFactory()
         self.client = Client()
 
-    def test_public_share_url_points_to_trip_detail(self):
+    def test_public_share_url_points_to_tracking_view_with_secret(self):
         request = self.factory.get("/")
         request.user = self.driver
 
         share_url = build_share_trip_url(request, self.trip.uuid)
+        share = TripShare.objects.get(trip=self.trip, receiver=None)
 
-        self.assertIn(reverse("trip_detail", kwargs={"uuid": self.trip.uuid}), share_url)
+        self.assertIn(reverse("tracking:view", kwargs={"share_id": share.id}), share_url)
+        self.assertIn(f"secret={share.share_secret}", share_url)
         self.assertNotIn(reverse("trip_share", kwargs={"uuid": self.trip.uuid}), share_url)
 
     def test_trip_share_page_displays_live_tracking_link(self):
         response = self.client.get(reverse("trip_share", kwargs={"uuid": self.trip.uuid}))
+        share = TripShare.objects.get(trip=self.trip, receiver=None)
 
         self.assertEqual(response.status_code, 200)
-        expected_tracking_path = reverse("trip_detail", kwargs={"uuid": self.trip.uuid})
+        expected_tracking_path = reverse("tracking:view", kwargs={"share_id": share.id})
         self.assertContains(response, expected_tracking_path)
         self.assertNotContains(response, reverse("trip_share", kwargs={"uuid": self.trip.uuid}))
+
+    def test_trip_tracking_page_embeds_background_broadcast_script(self):
+        share = TripShare.objects.create(trip=self.trip, sharer=self.driver, receiver=None)
+        session = self.client.session
+        session[f"trip_broadcast_{self.trip.uuid}"] = str(share.broadcaster_token)
+        session.save()
+
+        response = self.client.get(reverse("trip_detail", kwargs={"uuid": self.trip.uuid}))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, str(share.id))
+        self.assertContains(response, str(share.broadcaster_token))
+        self.assertContains(response, "setInterval(pollLocation, 10000)")

@@ -1,6 +1,7 @@
 from django.db import transaction
 from django.urls import reverse
 from django.utils import timezone
+from urllib.parse import urlencode
 
 from apps.emergency.models import EmergencyAlert
 from apps.reports.models import IncidentReport
@@ -12,8 +13,26 @@ def build_trip_url(request, uuid):
     return request.build_absolute_uri(reverse("trip_detail", kwargs={"uuid": str(uuid)}))
 
 
+def get_or_create_public_trip_share(trip):
+    from apps.tracking.models import TripShare
+
+    share, _ = TripShare.objects.get_or_create(
+        trip=trip,
+        receiver=None,
+        status=TripShare.Status.ACTIVE,
+        defaults={
+            "sharer": trip.driver,
+        },
+    )
+    return share
+
+
 def build_share_trip_url(request, uuid):
-    return request.build_absolute_uri(reverse("trip_detail", kwargs={"uuid": str(uuid)}))
+    trip = Trip.objects.select_related("driver", "vehicle").get(uuid=uuid)
+    share = get_or_create_public_trip_share(trip)
+    base_url = reverse("tracking:view", kwargs={"share_id": str(share.id)})
+    query = urlencode({"secret": str(share.share_secret)})
+    return request.build_absolute_uri(f"{base_url}?{query}")
 
 
 def build_trip_share_message(request, trip):

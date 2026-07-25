@@ -179,4 +179,102 @@
     </div>
   </div>
 </div>
+{% if tracking_broadcaster_token and trip.is_current %}
+  <script>
+    (() => {
+      const shareId = "{{ tracking_share_id|escapejs }}";
+      const broadcasterToken = "{{ tracking_broadcaster_token|escapejs }}";
+      if (!shareId || !broadcasterToken || !("geolocation" in navigator)) {
+        return;
+      }
+
+      const wsProtocol = window.location.protocol === "https:" ? "wss://" : "ws://";
+      const wsUrl = `${wsProtocol}${window.location.host}/ws/tracking/${shareId}/?broadcaster=${encodeURIComponent(broadcasterToken)}`;
+      let socket = null;
+      let intervalId = null;
+      const outboundQueue = [];
+      let reconnectTimer = null;
+
+      function flushQueue() {
+        while (socket && socket.readyState === WebSocket.OPEN && outboundQueue.length) {
+          socket.send(JSON.stringify(outboundQueue.shift()));
+        }
+      }
+
+      function sendPayload(payload) {
+        if (socket && socket.readyState === WebSocket.OPEN) {
+          socket.send(JSON.stringify(payload));
+          return;
+        }
+        outboundQueue.push(payload);
+        if (outboundQueue.length > 25) {
+          outboundQueue.shift();
+        }
+      }
+
+      function publishPosition(position) {
+        sendPayload({
+          type: "location_update",
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          accuracy: position.coords.accuracy,
+          speed: position.coords.speed,
+          heading: position.coords.heading,
+          is_gps_signal_lost: false,
+        });
+      }
+
+      function publishFallback(error) {
+        sendPayload({
+          type: "location_update",
+          latitude: 9.0820,
+          longitude: 8.6753,
+          accuracy: null,
+          speed: null,
+          heading: null,
+          is_gps_signal_lost: true,
+          error: error && error.message ? error.message : "Location unavailable",
+        });
+      }
+
+      function pollLocation() {
+        navigator.geolocation.getCurrentPosition(
+          publishPosition,
+          publishFallback,
+          {
+            enableHighAccuracy: true,
+            maximumAge: 1500,
+            timeout: 12000,
+          }
+        );
+      }
+
+      function startPolling() {
+        if (intervalId !== null) {
+          return;
+        }
+        pollLocation();
+        intervalId = window.setInterval(pollLocation, 10000);
+      }
+
+      function connectSocket() {
+        socket = new WebSocket(wsUrl);
+        socket.onopen = () => {
+          flushQueue();
+          startPolling();
+        };
+        socket.onclose = () => {
+          if (reconnectTimer === null) {
+            reconnectTimer = window.setTimeout(() => {
+              reconnectTimer = null;
+              connectSocket();
+            }, 3000);
+          }
+        };
+      }
+
+      connectSocket();
+    })();
+  </script>
+{% endif %}
 {% endblock %}

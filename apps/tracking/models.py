@@ -15,6 +15,7 @@ class TripShare(models.Model):
     sharer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='shared_trips')
     receiver = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='received_trips', null=True, blank=True)
     share_secret = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    broadcaster_token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     sharer_public_key = models.TextField(null=True, blank=True)
     receiver_public_key = models.TextField(null=True, blank=True)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.ACTIVE)

@@ -14,6 +14,7 @@ class VehicleRegistrationForm(forms.ModelForm):
             "vehicle_make",
             "vehicle_model",
             "vehicle_color",
+            "vin",
             "year",
             "registered_route",
             "insurance_number",
@@ -24,6 +25,7 @@ class VehicleRegistrationForm(forms.ModelForm):
             "vehicle_make": forms.TextInput(attrs={"class": "w-full", "autocomplete": "organization"}),
             "vehicle_model": forms.TextInput(attrs={"class": "w-full"}),
             "vehicle_color": forms.TextInput(attrs={"class": "w-full"}),
+            "vin": forms.TextInput(attrs={"class": "w-full", "autocomplete": "off", "placeholder": "Vehicle Identification Number"}),
             "year": forms.NumberInput(attrs={"class": "w-full", "min": 1900, "max": date.today().year + 1}),
             "registered_route": forms.TextInput(attrs={"class": "w-full", "placeholder": "Example: Airport - City Centre"}),
             "insurance_number": forms.TextInput(attrs={"class": "w-full", "autocomplete": "off"}),
@@ -31,3 +33,6 @@ class VehicleRegistrationForm(forms.ModelForm):
 
     def clean_plate_number(self):
         return self.cleaned_data["plate_number"].upper().replace(" ", "-")
+
+    def clean_vin(self):
+        return self.cleaned_data["vin"].strip().upper()

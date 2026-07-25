@@ -49,7 +49,7 @@ class TripShareCreateView(LoginRequiredMixin, View):
         })
 
 
-class TripShareView(LoginRequiredMixin, DetailView):
+class TripShareView(DetailView):
     model = TripShare
     template_name = "tracking/live_tracking.html"
     pk_url_kwarg = "share_id"
@@ -58,8 +58,8 @@ class TripShareView(LoginRequiredMixin, DetailView):
     def get_object(self, queryset=None):
         share = super().get_object(queryset)
         user = self.request.user
-        is_sharer = user.id == share.sharer.id
-        is_receiver = share.receiver and user.id == share.receiver.id
+        is_sharer = user.is_authenticated and user.id == share.sharer.id
+        is_receiver = user.is_authenticated and share.receiver and user.id == share.receiver.id
         if not is_sharer and not is_receiver:
             secret = self.request.GET.get('secret')
             if not secret or str(share.share_secret) != secret:
@@ -70,19 +70,28 @@ class TripShareView(LoginRequiredMixin, DetailView):
         ctx = super().get_context_data(**kwargs)
         share = self.get_object()
         user = self.request.user
+        viewer_secret = self.request.GET.get("secret", "")
+        session_broadcaster_token = self.request.session.get(f"trip_broadcast_{share.trip.uuid}", "")
         locations = list(
             LocationUpdate.objects.filter(trip_share=share)
             .order_by("timestamp")
             .values("latitude", "longitude", "accuracy", "speed", "heading", "timestamp", "is_gps_signal_lost")
         )
-        ctx['is_sharer'] = (user.id == share.sharer.id)
-        ctx['is_receiver'] = (share.receiver and user.id == share.receiver.id) or ('secret' in self.request.GET)
+        ctx['is_sharer'] = user.is_authenticated and (user.id == share.sharer.id)
+        ctx['is_receiver'] = (user.is_authenticated and share.receiver and user.id == share.receiver.id) or (viewer_secret == str(share.share_secret))
+        ctx['can_broadcast'] = session_broadcaster_token == str(share.broadcaster_token) or ctx['is_sharer']
         ctx['last_location'] = LocationUpdate.objects.filter(trip_share=share).order_by('-timestamp').first()
-        if ctx['is_sharer']:
+        if ctx['can_broadcast']:
             ctx['private_key'] = self.request.session.get(f'sharer_key_{share.id}', '')
         if ctx['is_receiver']:
             ctx['private_key'] = self.request.session.get(f'receiver_key_{share.id}', '')
         ctx['receiver_public_key'] = share.receiver_public_key or share.sharer_public_key
+        ctx['viewer_secret'] = viewer_secret if viewer_secret == str(share.share_secret) else ""
+        ctx['broadcaster_token'] = session_broadcaster_token if session_broadcaster_token == str(share.broadcaster_token) else ""
+        ctx['driver_verified_id'] = share.trip.driver.uuid
+        ctx['driver_contact_number'] = share.trip.driver.phone_number or "Not provided"
+        ctx['trip_entry_time'] = share.trip.started_at
+        ctx['vehicle_vin'] = share.trip.vehicle.vin or "Not available"
         ctx['history_points'] = [
             {
                 "latitude": float(point["latitude"]),

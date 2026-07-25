@@ -30,6 +30,7 @@ class Vehicle(models.Model):
     vehicle_make = models.CharField(max_length=80)
     vehicle_model = models.CharField(max_length=80)
     vehicle_color = models.CharField(max_length=40)
+    vin = models.CharField(max_length=64, blank=True, default="")
     year = models.PositiveIntegerField(
         validators=[MinValueValidator(1900), MaxValueValidator(date.today().year + 1)]
     )
@@ -132,5 +133,4 @@ class QRScanLog(models.Model):
 
     def __str__(self):
         return f"Scan({self.qr_code.vehicle.plate_number} at {self.scanned_at})"
-
 
