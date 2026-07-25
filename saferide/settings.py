@@ -34,6 +34,7 @@ CSRF_TRUSTED_ORIGINS = ["https://*.up.railway.app", "https://rideguardeng-produc
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -47,6 +48,7 @@ INSTALLED_APPS = [
     "apps.trips",
     "apps.emergency",
     "apps.reports",
+    "apps.tracking",
 ]
 
 MIDDLEWARE = [
@@ -136,4 +138,15 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "admin:index"
 TEMPLATES[0]["DIRS"] = [BASE_DIR / "templates"]
+
+# Channels Configuration
+ASGI_APPLICATION = 'saferide.asgi.application'
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [os.environ.get('REDIS_URL', 'redis://127.0.0.1:6379')],
+        },
+    },
+}
 

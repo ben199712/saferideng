@@ -1,0 +1,541 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Live Tracking • SafeRide NG{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+  <div class="mb-6">
+    <div class="text-xs font-semibold uppercase tracking-[0.04em] text-on-surface-variant mb-2">RideGuarde Tracking</div>
+    <div class="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+      <div>
+        <h1 class="text-headline-md font-bold text-on-surface">Live Trip Tracking</h1>
+        <p class="mt-1 text-body-md text-on-surface-variant">
+          Real-time location updates for trip <span class="font-semibold text-primary">#{{ trip_share.trip_id }}</span>.
+        </p>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        {% if is_sharer %}
+          <span class="inline-flex items-center gap-2 rounded-full bg-blue-50 border border-blue-200 px-4 py-2 text-sm font-semibold text-blue-700">
+            You are broadcasting
+          </span>
+        {% else %}
+          <span class="inline-flex items-center gap-2 rounded-full bg-green-50 border border-green-200 px-4 py-2 text-sm font-semibold text-green-700">
+            You are viewing
+          </span>
+        {% endif %}
+        <a href="{% url 'tracking:list' %}" class="inline-flex items-center rounded-xl border border-outline-variant/60 bg-white px-4 py-2.5 text-sm font-semibold text-primary hover:bg-surface-container-low transition">
+          All Shares
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 xl:grid-cols-[380px_minmax(0,1fr)] gap-6">
+    <section class="space-y-6">
+      <div class="rounded-[2rem] border border-outline-variant/40 bg-white p-6 shadow-soft">
+        <div class="text-xs font-semibold uppercase tracking-[0.04em] text-on-surface-variant mb-5">Tracking Overview</div>
+        <div class="space-y-4">
+          <div class="rounded-2xl bg-surface-container-low p-4">
+            <div class="text-xs uppercase tracking-[0.04em] text-on-surface-variant">Sharer</div>
+            <div class="mt-1 font-semibold text-on-surface">{{ trip_share.sharer.full_name|default:trip_share.sharer.email }}</div>
+            <div class="text-sm text-on-surface-variant">{{ trip_share.sharer.email }}</div>
+          </div>
+          <div class="rounded-2xl bg-surface-container-low p-4">
+            <div class="text-xs uppercase tracking-[0.04em] text-on-surface-variant">Trip Route</div>
+            <div class="mt-1 text-sm text-on-surface"><span class="font-semibold">From:</span> {{ trip_share.trip.start_location }}</div>
+            <div class="text-sm text-on-surface"><span class="font-semibold">To:</span> {{ trip_share.trip.destination }}</div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="rounded-2xl border border-outline-variant/30 p-4">
+              <div class="text-xs uppercase tracking-[0.04em] text-on-surface-variant">Status</div>
+              <div id="status-text" class="mt-2 font-semibold text-on-surface">{{ trip_share.get_status_display }}</div>
+            </div>
+            <div class="rounded-2xl border border-outline-variant/30 p-4">
+              <div class="text-xs uppercase tracking-[0.04em] text-on-surface-variant">Updates</div>
+              <div id="updates-count" class="mt-2 font-semibold text-on-surface">0</div>
+            </div>
+            <div class="rounded-2xl border border-outline-variant/30 p-4">
+              <div class="text-xs uppercase tracking-[0.04em] text-on-surface-variant">Connection</div>
+              <div id="connection-state" class="mt-2 font-semibold text-amber-700">Connecting</div>
+            </div>
+            <div class="rounded-2xl border border-outline-variant/30 p-4">
+              <div class="text-xs uppercase tracking-[0.04em] text-on-surface-variant">GPS</div>
+              <div id="gps-state" class="mt-2 font-semibold text-on-surface">Waiting</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rounded-[2rem] border border-outline-variant/40 bg-white p-6 shadow-soft">
+        <div class="flex items-center justify-between gap-3 mb-5">
+          <div>
+            <div class="text-xs font-semibold uppercase tracking-[0.04em] text-on-surface-variant">Latest Position</div>
+            <div class="text-sm text-on-surface-variant mt-1">Live telemetry and timestamp</div>
+          </div>
+          <span id="live-badge" class="inline-flex items-center gap-2 rounded-full bg-green-50 border border-green-200 px-3 py-1.5 text-xs font-semibold text-green-700">
+            Live
+          </span>
+        </div>
+        <div class="space-y-3 text-sm">
+          <div class="flex justify-between gap-4">
+            <span class="text-on-surface-variant">Latitude</span>
+            <span id="lat-display" class="font-mono text-on-surface">-</span>
+          </div>
+          <div class="flex justify-between gap-4">
+            <span class="text-on-surface-variant">Longitude</span>
+            <span id="lng-display" class="font-mono text-on-surface">-</span>
+          </div>
+          <div class="flex justify-between gap-4">
+            <span class="text-on-surface-variant">Accuracy</span>
+            <span id="accuracy-display" class="text-on-surface">-</span>
+          </div>
+          <div class="flex justify-between gap-4">
+            <span class="text-on-surface-variant">Speed</span>
+            <span id="speed-display" class="text-on-surface">-</span>
+          </div>
+          <div class="flex justify-between gap-4">
+            <span class="text-on-surface-variant">Timestamp</span>
+            <span id="timestamp-display" class="text-on-surface">-</span>
+          </div>
+        </div>
+        <div id="signal-alert" class="hidden mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          GPS signal is unavailable. The map shows the last known position until a fresh update arrives.
+        </div>
+      </div>
+
+      <div class="rounded-[2rem] border border-outline-variant/40 bg-white p-6 shadow-soft">
+        <div class="flex items-center justify-between gap-3 mb-5">
+          <div>
+            <div class="text-xs font-semibold uppercase tracking-[0.04em] text-on-surface-variant">Playback</div>
+            <div class="text-sm text-on-surface-variant mt-1">Review historical route updates without losing the live feed.</div>
+          </div>
+        </div>
+        <div class="space-y-4">
+          <input id="playback-slider" type="range" min="0" max="0" value="0" class="w-full" />
+          <div class="flex flex-wrap gap-2">
+            <button id="playback-start" type="button" class="inline-flex items-center rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#1d4ed8] transition">
+              Play Route
+            </button>
+            <button id="playback-stop" type="button" class="inline-flex items-center rounded-xl border border-outline-variant/60 bg-white px-4 py-2.5 text-sm font-semibold text-on-surface hover:bg-surface-container-low transition">
+              Stop
+            </button>
+            <button id="fit-route" type="button" class="inline-flex items-center rounded-xl border border-outline-variant/60 bg-white px-4 py-2.5 text-sm font-semibold text-on-surface hover:bg-surface-container-low transition">
+              Fit Route
+            </button>
+          </div>
+          <div id="playback-label" class="text-sm text-on-surface-variant">No playback point selected.</div>
+        </div>
+      </div>
+
+      {% if is_sharer %}
+        <div class="rounded-[2rem] border border-outline-variant/40 bg-white p-6 shadow-soft">
+          <div class="text-xs font-semibold uppercase tracking-[0.04em] text-on-surface-variant mb-4">Broadcast Controls</div>
+          <div class="space-y-3">
+            <button id="start-sharing" type="button" class="w-full inline-flex items-center justify-center rounded-xl bg-secondary px-4 py-3 text-sm font-semibold text-white hover:opacity-90 transition">
+              Start Sharing Location
+            </button>
+            <button id="stop-sharing" type="button" class="hidden w-full inline-flex items-center justify-center rounded-xl bg-red-600 px-4 py-3 text-sm font-semibold text-white hover:bg-red-700 transition">
+              Stop Sharing
+            </button>
+            <p class="text-sm text-on-surface-variant">
+              The browser uses high-accuracy geolocation. Updates are sent over the WebSocket channel and drawn on the map in real time.
+            </p>
+          </div>
+        </div>
+      {% endif %}
+    </section>
+
+    <section class="space-y-6">
+      <div class="rounded-[2rem] border border-outline-variant/40 bg-white p-4 shadow-soft">
+        <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between p-2">
+          <div>
+            <div class="font-semibold text-on-surface">Interactive Map</div>
+            <div class="text-sm text-on-surface-variant">Custom markers, route trail, geofence ring, and live popups.</div>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button id="toggle-geofence" type="button" class="inline-flex items-center rounded-xl border border-outline-variant/60 bg-white px-4 py-2.5 text-sm font-semibold text-on-surface hover:bg-surface-container-low transition">
+              Toggle Geofence
+            </button>
+            <button id="center-live" type="button" class="inline-flex items-center rounded-xl border border-outline-variant/60 bg-white px-4 py-2.5 text-sm font-semibold text-on-surface hover:bg-surface-container-low transition">
+              Center Live Marker
+            </button>
+          </div>
+        </div>
+        <div id="tracking-map" class="h-[420px] sm:h-[520px] lg:h-[680px] rounded-[1.5rem] overflow-hidden border border-outline-variant/30"></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<style>
+  .tracking-marker {
+    align-items: center;
+    border-radius: 999px;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+    display: flex;
+    font-size: 10px;
+    font-weight: 700;
+    height: 18px;
+    justify-content: center;
+    width: 18px;
+  }
+  .tracking-marker-live {
+    background: #2563EB;
+    border: 3px solid #ffffff;
+  }
+  .tracking-marker-playback {
+    background: #1b6d24;
+    border: 3px solid #ffffff;
+  }
+  .leaflet-container {
+    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  }
+</style>
+
+{{ history_points|json_script:"tracking-history-data" }}
+<script>
+  (() => {
+    const historyPoints = JSON.parse(document.getElementById("tracking-history-data").textContent || "[]");
+    const isSharer = {% if is_sharer %}true{% else %}false{% endif %};
+    const tripShareId = "{{ trip_share.id }}";
+    const geofenceRadius = {{ geofence_radius_meters|default:250 }};
+    const defaultLat = historyPoints.length ? historyPoints[historyPoints.length - 1].latitude : 9.0820;
+    const defaultLng = historyPoints.length ? historyPoints[historyPoints.length - 1].longitude : 8.6753;
+    const wsProtocol = window.location.protocol === "https:" ? "wss://" : "ws://";
+    const wsUrl = `${wsProtocol}${window.location.host}/ws/tracking/${tripShareId}/`;
+
+    const connectionState = document.getElementById("connection-state");
+    const gpsState = document.getElementById("gps-state");
+    const updatesCount = document.getElementById("updates-count");
+    const signalAlert = document.getElementById("signal-alert");
+    const timestampDisplay = document.getElementById("timestamp-display");
+    const latDisplay = document.getElementById("lat-display");
+    const lngDisplay = document.getElementById("lng-display");
+    const accuracyDisplay = document.getElementById("accuracy-display");
+    const speedDisplay = document.getElementById("speed-display");
+    const playbackLabel = document.getElementById("playback-label");
+    const playbackSlider = document.getElementById("playback-slider");
+
+    const liveIcon = L.divIcon({
+      className: "",
+      html: '<div class="tracking-marker tracking-marker-live"></div>',
+      iconSize: [18, 18],
+      iconAnchor: [9, 9],
+    });
+    const playbackIcon = L.divIcon({
+      className: "",
+      html: '<div class="tracking-marker tracking-marker-playback"></div>',
+      iconSize: [18, 18],
+      iconAnchor: [9, 9],
+    });
+
+    const map = L.map("tracking-map", {
+      zoomControl: true,
+      preferCanvas: true,
+    }).setView([defaultLat, defaultLng], 14);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: "&copy; OpenStreetMap contributors",
+    }).addTo(map);
+
+    const routeLine = L.polyline([], {
+      color: "#2563EB",
+      weight: 4,
+      opacity: 0.85,
+      lineJoin: "round",
+    }).addTo(map);
+
+    const replayLine = L.polyline([], {
+      color: "#1b6d24",
+      weight: 4,
+      opacity: 0.95,
+      dashArray: "8 6",
+      lineJoin: "round",
+    }).addTo(map);
+
+    const liveMarker = L.marker([defaultLat, defaultLng], { icon: liveIcon }).addTo(map);
+    const playbackMarker = L.marker([defaultLat, defaultLng], { icon: playbackIcon, opacity: 0 }).addTo(map);
+    let geofenceCircle = L.circle([defaultLat, defaultLng], {
+      radius: geofenceRadius,
+      color: "#1b6d24",
+      fillColor: "#a0f399",
+      fillOpacity: 0.14,
+      weight: 2,
+    }).addTo(map);
+    let geofenceVisible = true;
+    let socket = null;
+    let reconnectAttempts = 0;
+    let playbackTimer = null;
+    let geoWatchId = null;
+    const outboundQueue = [];
+
+    function setStatus(el, text, classes) {
+      el.textContent = text;
+      el.className = `mt-2 font-semibold ${classes}`;
+    }
+
+    function formatSpeed(speed) {
+      if (speed === null || speed === undefined || Number.isNaN(Number(speed))) {
+        return "-";
+      }
+      return `${(Number(speed) * 3.6).toFixed(1)} km/h`;
+    }
+
+    function formatAccuracy(accuracy) {
+      if (accuracy === null || accuracy === undefined || Number.isNaN(Number(accuracy))) {
+        return "-";
+      }
+      return `${Math.round(Number(accuracy))} m`;
+    }
+
+    function setTelemetry(point) {
+      latDisplay.textContent = Number(point.latitude).toFixed(6);
+      lngDisplay.textContent = Number(point.longitude).toFixed(6);
+      accuracyDisplay.textContent = formatAccuracy(point.accuracy);
+      speedDisplay.textContent = formatSpeed(point.speed);
+      timestampDisplay.textContent = point.timestamp ? new Date(point.timestamp).toLocaleString() : "-";
+      updatesCount.textContent = String(historyPoints.length);
+
+      if (point.is_gps_signal_lost) {
+        setStatus(gpsState, "Signal Lost", "text-amber-700");
+        signalAlert.classList.remove("hidden");
+      } else {
+        setStatus(gpsState, "Active", "text-green-700");
+        signalAlert.classList.add("hidden");
+      }
+    }
+
+    function markerPopup(point, label) {
+      return `
+        <div class="text-sm">
+          <div class="font-semibold">${label}</div>
+          <div>Lat: ${Number(point.latitude).toFixed(6)}</div>
+          <div>Lng: ${Number(point.longitude).toFixed(6)}</div>
+          <div>Time: ${point.timestamp ? new Date(point.timestamp).toLocaleString() : "-"}</div>
+          <div>Accuracy: ${formatAccuracy(point.accuracy)}</div>
+        </div>
+      `;
+    }
+
+    function redrawRoute() {
+      const latLngs = historyPoints.map((point) => [Number(point.latitude), Number(point.longitude)]);
+      routeLine.setLatLngs(latLngs);
+      updatesCount.textContent = String(historyPoints.length);
+      playbackSlider.max = String(Math.max(historyPoints.length - 1, 0));
+
+      if (historyPoints.length) {
+        const latest = historyPoints[historyPoints.length - 1];
+        const latestLatLng = [Number(latest.latitude), Number(latest.longitude)];
+        liveMarker.setLatLng(latestLatLng);
+        geofenceCircle.setLatLng(latestLatLng);
+        liveMarker.bindPopup(markerPopup(latest, "Live Position"));
+        setTelemetry(latest);
+      }
+    }
+
+    function fitRoute() {
+      const bounds = routeLine.getBounds();
+      if (bounds.isValid()) {
+        map.fitBounds(bounds.pad(0.15));
+      }
+    }
+
+    function updatePlayback(index) {
+      if (!historyPoints.length) {
+        playbackLabel.textContent = "No playback point selected.";
+        return;
+      }
+
+      const safeIndex = Math.max(0, Math.min(index, historyPoints.length - 1));
+      playbackSlider.value = String(safeIndex);
+      const point = historyPoints[safeIndex];
+      const latLng = [Number(point.latitude), Number(point.longitude)];
+
+      playbackMarker.setOpacity(1);
+      playbackMarker.setLatLng(latLng);
+      playbackMarker.bindPopup(markerPopup(point, "Playback Position"));
+      replayLine.setLatLngs(historyPoints.slice(0, safeIndex + 1).map((entry) => [Number(entry.latitude), Number(entry.longitude)]));
+      playbackLabel.textContent = `Playback ${safeIndex + 1} of ${historyPoints.length}: ${new Date(point.timestamp).toLocaleString()}`;
+      map.panTo(latLng, { animate: true, duration: 0.35 });
+    }
+
+    function stopPlayback() {
+      if (playbackTimer) {
+        clearInterval(playbackTimer);
+        playbackTimer = null;
+      }
+      playbackMarker.setOpacity(0);
+      replayLine.setLatLngs([]);
+      playbackLabel.textContent = "Playback stopped. Live route remains visible.";
+    }
+
+    function queueOrSend(payload) {
+      if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify(payload));
+        return;
+      }
+      outboundQueue.push(payload);
+      if (outboundQueue.length > 50) {
+        outboundQueue.shift();
+      }
+    }
+
+    function flushQueue() {
+      while (socket && socket.readyState === WebSocket.OPEN && outboundQueue.length) {
+        socket.send(JSON.stringify(outboundQueue.shift()));
+      }
+    }
+
+    function connectSocket() {
+      socket = new WebSocket(wsUrl);
+
+      socket.onopen = () => {
+        reconnectAttempts = 0;
+        setStatus(connectionState, "Connected", "text-green-700");
+        flushQueue();
+      };
+
+      socket.onmessage = (event) => {
+        const payload = JSON.parse(event.data);
+        if (payload.type !== "location_update") {
+          return;
+        }
+
+        const incoming = {
+          latitude: Number(payload.latitude),
+          longitude: Number(payload.longitude),
+          accuracy: payload.accuracy,
+          speed: payload.speed,
+          heading: payload.heading,
+          timestamp: payload.timestamp,
+          is_gps_signal_lost: payload.is_gps_signal_lost,
+        };
+        historyPoints.push(incoming);
+        redrawRoute();
+        liveMarker.openPopup();
+      };
+
+      socket.onclose = () => {
+        setStatus(connectionState, "Reconnecting", "text-amber-700");
+        const waitMs = Math.min(30000, 1000 * (2 ** reconnectAttempts));
+        reconnectAttempts += 1;
+        window.setTimeout(connectSocket, waitMs);
+      };
+
+      socket.onerror = () => {
+        setStatus(connectionState, "Connection Error", "text-red-700");
+      };
+    }
+
+    function broadcastPosition(position) {
+      const payload = {
+        type: "location_update",
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+        accuracy: position.coords.accuracy,
+        speed: position.coords.speed,
+        heading: position.coords.heading,
+        is_gps_signal_lost: false,
+      };
+      queueOrSend(payload);
+    }
+
+    function handleGeoError(error) {
+      setStatus(gpsState, "Signal Lost", "text-amber-700");
+      signalAlert.classList.remove("hidden");
+      queueOrSend({
+        type: "location_update",
+        latitude: historyPoints.length ? historyPoints[historyPoints.length - 1].latitude : defaultLat,
+        longitude: historyPoints.length ? historyPoints[historyPoints.length - 1].longitude : defaultLng,
+        is_gps_signal_lost: true,
+      });
+      if (error && error.message) {
+        playbackLabel.textContent = `Geolocation warning: ${error.message}`;
+      }
+    }
+
+    function startSharing() {
+      if (!("geolocation" in navigator)) {
+        setStatus(gpsState, "Unsupported", "text-red-700");
+        return;
+      }
+      document.getElementById("start-sharing").classList.add("hidden");
+      document.getElementById("stop-sharing").classList.remove("hidden");
+      geoWatchId = navigator.geolocation.watchPosition(
+        broadcastPosition,
+        handleGeoError,
+        {
+          enableHighAccuracy: true,
+          maximumAge: 1500,
+          timeout: 12000,
+        }
+      );
+    }
+
+    function stopSharing() {
+      if (geoWatchId !== null) {
+        navigator.geolocation.clearWatch(geoWatchId);
+        geoWatchId = null;
+      }
+      document.getElementById("start-sharing").classList.remove("hidden");
+      document.getElementById("stop-sharing").classList.add("hidden");
+      setStatus(gpsState, "Paused", "text-on-surface");
+    }
+
+    redrawRoute();
+    if (historyPoints.length) {
+      fitRoute();
+      liveMarker.openPopup();
+    } else {
+      liveMarker.bindPopup(markerPopup({ latitude: defaultLat, longitude: defaultLng, timestamp: null, accuracy: null }, "Awaiting Position"));
+    }
+    connectSocket();
+
+    playbackSlider.addEventListener("input", (event) => {
+      stopPlayback();
+      updatePlayback(Number(event.target.value));
+    });
+
+    document.getElementById("playback-start").addEventListener("click", () => {
+      if (!historyPoints.length) {
+        playbackLabel.textContent = "No route history is available yet.";
+        return;
+      }
+      stopPlayback();
+      let index = 0;
+      updatePlayback(index);
+      playbackTimer = window.setInterval(() => {
+        index += 1;
+        if (index >= historyPoints.length) {
+          stopPlayback();
+          return;
+        }
+        updatePlayback(index);
+      }, 900);
+    });
+
+    document.getElementById("playback-stop").addEventListener("click", stopPlayback);
+    document.getElementById("fit-route").addEventListener("click", fitRoute);
+    document.getElementById("center-live").addEventListener("click", () => {
+      map.panTo(liveMarker.getLatLng(), { animate: true, duration: 0.35 });
+      liveMarker.openPopup();
+    });
+    document.getElementById("toggle-geofence").addEventListener("click", () => {
+      geofenceVisible = !geofenceVisible;
+      if (geofenceVisible) {
+        geofenceCircle.addTo(map);
+      } else {
+        map.removeLayer(geofenceCircle);
+      }
+    });
+
+    if (isSharer) {
+      document.getElementById("start-sharing").addEventListener("click", startSharing);
+      document.getElementById("stop-sharing").addEventListener("click", stopSharing);
+    }
+  })();
+</script>
+{% endblock %}

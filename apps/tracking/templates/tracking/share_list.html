@@ -1,0 +1,85 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Tracking Shares • SafeRide NG{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+  <div class="mb-6">
+    <div class="text-xs font-semibold uppercase tracking-[0.04em] text-on-surface-variant mb-2">RideGuarde Tracking</div>
+    <h1 class="text-headline-md font-bold text-on-surface">Tracking Shares</h1>
+    <p class="mt-1 text-body-md text-on-surface-variant">
+      Review all active and historical trip shares available to your account.
+    </p>
+  </div>
+
+  {% if shares %}
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      {% for share in shares %}
+        <article class="rounded-[2rem] border border-outline-variant/40 bg-white p-6 shadow-soft">
+          <div class="flex items-start justify-between gap-4 mb-5">
+            <div>
+              <div class="text-xs font-semibold uppercase tracking-[0.04em] text-on-surface-variant">Trip Share</div>
+              <div class="mt-1 text-lg font-bold text-primary">#{{ share.trip_id }}</div>
+            </div>
+            <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold
+              {% if share.status == 'active' %}
+                bg-green-50 text-green-700 border border-green-200
+              {% elif share.status == 'expired' %}
+                bg-amber-50 text-amber-700 border border-amber-200
+              {% else %}
+                bg-red-50 text-red-700 border border-red-200
+              {% endif %}">
+              {{ share.get_status_display }}
+            </span>
+          </div>
+
+          <div class="space-y-3 text-sm">
+            <div>
+              <div class="text-on-surface-variant">Sharer</div>
+              <div class="font-semibold text-on-surface">{{ share.sharer.full_name|default:share.sharer.email }}</div>
+              <div class="text-on-surface-variant">{{ share.sharer.email }}</div>
+            </div>
+            <div>
+              <div class="text-on-surface-variant">Receiver</div>
+              <div class="font-semibold text-on-surface">
+                {% if share.receiver %}
+                  {{ share.receiver.full_name|default:share.receiver.email }}
+                {% else %}
+                  Shared by secret link
+                {% endif %}
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div class="rounded-2xl bg-surface-container-low p-3">
+                <div class="text-xs uppercase tracking-[0.04em] text-on-surface-variant">Origin</div>
+                <div class="mt-1 text-on-surface">{{ share.trip.start_location }}</div>
+              </div>
+              <div class="rounded-2xl bg-surface-container-low p-3">
+                <div class="text-xs uppercase tracking-[0.04em] text-on-surface-variant">Destination</div>
+                <div class="mt-1 text-on-surface">{{ share.trip.destination }}</div>
+              </div>
+            </div>
+            <div class="text-on-surface-variant">Created {{ share.created_at|date:"M d, Y H:i" }}</div>
+          </div>
+
+          <div class="mt-6 flex flex-wrap gap-2">
+            <a href="{% url 'tracking:view' share.id %}" class="inline-flex items-center rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#1d4ed8] transition">
+              Open Live Map
+            </a>
+            <a href="{% url 'tracking:view' share.id %}?secret={{ share.share_secret }}" class="inline-flex items-center rounded-xl border border-outline-variant/60 bg-white px-4 py-2.5 text-sm font-semibold text-on-surface hover:bg-surface-container-low transition">
+              Secret Link View
+            </a>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="rounded-[2rem] border border-dashed border-outline-variant bg-white p-10 text-center shadow-soft">
+      <div class="text-lg font-bold text-on-surface">No tracking shares yet</div>
+      <p class="mt-2 text-on-surface-variant">
+        Once a trip is shared for live tracking, it will appear here with direct links to the live map and history playback.
+      </p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

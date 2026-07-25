@@ -29,6 +29,7 @@ urlpatterns = [
     path("", include("apps.trips.urls")),
     path("", include("apps.emergency.urls")),
     path("", include("apps.reports.urls")),
+    path("tracking/", include("apps.tracking.urls")),
 ]
 
 if settings.DEBUG:

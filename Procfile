@@ -1,1 +1,1 @@
-web: gunicorn saferide.wsgi
+web: daphne saferide.asgi:application --port $PORT
