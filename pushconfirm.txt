@@ -1,0 +1,32 @@
+{
+  "remote_branches": {
+    "rc": 0,
+    "out": "origin\thttps://github.com/ben199712/saferideng.git (fetch)\norigin\thttps://github.com/ben199712/saferideng.git (push)\n",
+    "err": ""
+  },
+  "log": {
+    "rc": 0,
+    "out": "dd028fb Driver registration fixes: State/LGA dropdown, AJAX submit, secret scrub.\nd4bc296 git issue fixed\n61cacc2 live track and sharing page fixed\nc3ad052 share trip fixed\nc7bd511 update profile button fixed\n",
+    "err": ""
+  },
+  "ahead_behind": {
+    "rc": 0,
+    "out": "0\t0\n",
+    "err": ""
+  },
+  "fetch_status": {
+    "rc": 0,
+    "out": "",
+    "err": ""
+  },
+  "ahead_after_fetch": {
+    "rc": 0,
+    "out": "0\t0\n",
+    "err": ""
+  },
+  "diff_origin": {
+    "rc": 0,
+    "out": "",
+    "err": ""
+  }
+}
