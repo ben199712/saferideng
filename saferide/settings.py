@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 import os
-import sys
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -24,18 +23,20 @@ load_dotenv(BASE_DIR / ".env")
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
+# Compute DEBUG BEFORE the SECRET_KEY gate so dev vs production policy
+# can be decided without ever baking a static fallback key into source.
+DEBUG = os.environ.get("DJANGO_DEBUG", "True") == "True"
+
 # SECURITY WARNING: keep the secret key used in production secret!
 # NEVER bake a default fallback secret into source — require DJANGO_SECRET_KEY env var.
+#   * If the env var is set: always use it, regardless of DEBUG.
+#   * Else when DEBUG=True (dev/staging): generate a throwaway per-process key so
+#     local `manage.py` and any dev container still boots out of the box.
+#   * Else when DEBUG=False (production): refuse to start — a long-lived key MUST
+#     be configured explicitly for production (sessions/signing tokens depend on it).
 _SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "").strip()
 if not _SECRET_KEY:
-    # In interactive development (e.g. manage.py runserver) generate a throwaway
-    # per-process key. In production/management commands we refuse to start.
-    _is_interactive_dev = (
-        len(sys.argv) > 0
-        and any(sys.argv[0].endswith(s) for s in ("manage.py", "django-admin"))
-        and (len(sys.argv) < 2 or sys.argv[1] in {"runserver", "runserver_plus", "shell", "shell_plus", "check", "test"})
-    )
-    if _is_interactive_dev:
+    if DEBUG:
         try:
             from django.core.management.utils import get_random_secret_key
             _SECRET_KEY = get_random_secret_key()
@@ -50,7 +51,7 @@ if not _SECRET_KEY:
 SECRET_KEY = _SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DJANGO_DEBUG", "True") == "True"
+# (DEBUG was computed above; alias kept for readability.)
 
 ALLOWED_HOSTS = [".localhost", "127.0.0.1", "[::1]", "testserver", ".railway.app", ".rideguarde.com", "rideguarde.com"]
 
