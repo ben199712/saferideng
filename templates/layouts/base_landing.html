@@ -1,0 +1,284 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}RideGarde — Scan Before You Enter{% endblock %}</title>
+<script>
+  (function () {
+    try {
+      var stored = localStorage.getItem("ridegarde-theme");
+      var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      var theme = stored ? stored : (prefersDark ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", theme);
+    } catch (e) {
+      document.documentElement.setAttribute("data-theme", "light");
+    }
+  })();
+</script>
+{% include "partials/theme_head.html" %}
+<style>
+section{scroll-margin-top:96px}
+.mono{font-family:var(--mono)}
+.main-wrap{padding:0 0 0;max-width:none;margin:0}
+.foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:44px}
+.foot-grid h4{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:18px}
+.foot-grid a{display:block;color:var(--muted);font-size:14px;padding:5px 0;transition:color .2s}
+.foot-grid a:hover{color:var(--green)}
+.foot-brand p{color:var(--muted);font-size:14px;margin-top:16px;max-width:280px}
+.foot-bottom{border-top:1px solid var(--line);margin-top:56px;padding-top:26px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+@media(max-width:860px){.foot-grid{grid-template-columns:1fr 1fr;gap:28px}}
+@media(max-width:540px){.foot-grid{grid-template-columns:1fr}}
+main .page-messages{max-width:1180px;margin:0 auto;padding:28px 28px 0}
+main .page-messages .msg{padding:14px 20px;border-radius:14px;font-size:14px;border:1px solid var(--line-strong);margin-bottom:10px;background:var(--surface);color:var(--text);animation:fadeIn .3s ease}
+main .page-messages .msg-success{border-color:rgba(47,227,141,.4);background:var(--green-soft);color:var(--text)}
+main .page-messages .msg-error{border-color:rgba(255,107,94,.4);background:rgba(255,107,94,.1);color:var(--text)}
+main .page-messages .msg-warning{border-color:rgba(255,194,75,.4);background:var(--amber-soft);color:var(--text)}
+.modal{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:20px;visibility:hidden;opacity:0;transition:.3s}
+.modal.open{visibility:visible;opacity:1}
+.modal-backdrop{position:absolute;inset:0;background:rgba(3,8,6,.8);backdrop-filter:blur(8px)}
+.modal-card{position:relative;width:100%;max-width:440px;background:var(--surface);border:1px solid var(--line-strong);border-radius:24px;padding:34px;box-shadow:var(--shadow-lg);transform:translateY(16px) scale(.97);transition:.35s}
+.modal.open .modal-card{transform:none}
+.modal-close{position:absolute;top:16px;right:16px;width:36px;height:36px;border-radius:10px;border:1px solid var(--line);display:grid;place-items:center;color:var(--muted)}
+.modal-close:hover{color:var(--red);border-color:var(--red)}
+.modal h3{font-size:22px;margin:14px 0 6px}
+.modal .msub{color:var(--muted);font-size:13.5px}
+.mform{display:flex;gap:10px;margin-top:24px}
+.mform input{flex:1;background:var(--bg);border:1px solid var(--line-strong);border-radius:12px;padding:14px 16px;color:var(--text);font-family:var(--mono);font-size:13px;outline:none;transition:border-color .2s}
+.mform input:focus{border-color:var(--green)}
+.mform button{background:var(--green);color:#04120a;font-weight:800;font-family:var(--display);border-radius:12px;padding:0 20px}
+.mscan{display:none;margin-top:26px;text-align:center;padding:26px 0;border:1px dashed var(--line-strong);border-radius:16px}
+.mscan .bar{height:3px;border-radius:99px;background:var(--surface2);overflow:hidden;margin:18px 34px 12px}
+.mscan .bar i{display:block;height:100%;width:40%;background:var(--green);border-radius:99px;animation:load 1.1s ease-in-out infinite}
+@keyframes load{0%{margin-left:-40%}100%{margin-left:100%}}
+.mscan p{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+.mresult{display:none;margin-top:26px;border:1px solid rgba(47,227,141,.4);background:var(--green-soft);border-radius:16px;padding:22px}
+.mresult .top{display:flex;gap:12px;align-items:center}
+.mresult .top svg{width:30px;height:30px;stroke:var(--green);flex-shrink:0}
+.mresult b{font-family:var(--display);font-size:16px}
+.mresult .rid{font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+.mresult .rows{margin-top:14px;display:grid;gap:6px;font-size:13px;color:var(--muted)}
+.mresult .rows b{color:var(--text);font-size:13px}
+.modal[data-state="scanning"] .mscan{display:block}
+.modal[data-state="scanning"] .mform{display:none}
+.modal[data-state="result"] .mresult{display:block}
+.modal[data-state="result"] .mform{display:none}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <span class="live"><span class="dot"></span> Civic Trust &amp; Security Portal</span>
+    <span class="hide-s">Synced with National Security Databases · NG</span>
+  </div>
+</div>
+
+<header class="nav" id="siteNav">
+  <div class="nav-inner">
+    <a class="logo" href="{% url 'home' %}" aria-label="RideGarde home">
+      <svg viewBox="0 0 36 36" fill="none"><path d="M18 2l13 4.8v9.4c0 8.6-5.5 14.6-13 17.8C10.5 30.8 5 24.8 5 16.2V6.8L18 2z" fill="#0d5c3b"/><path d="M18 2l13 4.8v9.4c0 8.6-5.5 14.6-13 17.8V2z" fill="#2fe38d" opacity=".25"/><rect x="12" y="11" width="5" height="5" fill="#2fe38d"/><rect x="19" y="11" width="5" height="5" fill="#eaf5ef"/><rect x="12" y="18" width="5" height="5" fill="#eaf5ef"/><rect x="19" y="18" width="5" height="5" fill="#2fe38d"/></svg>
+      Ride<em>Garde</em>
+    </a>
+    <nav class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#features">Safety features</a>
+      <a href="#demo">Live demo</a>
+      <a href="#partners">Partners</a>
+      {% if user.is_authenticated %}
+        {% if user.role == "driver" %}
+          <a href="{% url 'driver_profile' %}">Driver Profile</a>
+          <a href="{% url 'driver_vehicle_list' %}">Vehicles</a>
+          <a href="{% url 'my_trips' %}">My Trips</a>
+        {% else %}
+          <a href="{% url 'dashboard_home' %}">Dashboard</a>
+          <a href="{% url 'admin_vehicle_dashboard' %}">Vehicles</a>
+          <a href="{% url 'emergency_dashboard' %}">Emergency</a>
+        {% endif %}
+      {% else %}
+        <a href="{% url 'login' %}">Login</a>
+      {% endif %}
+    </nav>
+    <div class="nav-cta">
+      <button class="btn btn-ghost" data-open-modal>Verify Vehicle</button>
+      {% if user.is_authenticated %}
+        <form method="post" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-primary">Logout</button>
+        </form>
+      {% else %}
+        <a class="btn btn-primary" href="{% url 'register' %}">Get Started</a>
+      {% endif %}
+      <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle light/dark mode" title="Toggle light/dark mode">
+        <span class="material-symbols-outlined i-moon">dark_mode</span>
+        <span class="material-symbols-outlined i-sun">light_mode</span>
+      </button>
+      <button class="burger" id="burger" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#how">How it works</a>
+  <a href="#features">Safety features</a>
+  <a href="#demo">Live demo</a>
+  <a href="#partners">Partners</a>
+  {% if user.is_authenticated %}
+    {% if user.role == "driver" %}
+      <a href="{% url 'driver_profile' %}">Driver Profile</a>
+      <a href="{% url 'driver_vehicle_list' %}">Vehicles</a>
+      <a href="{% url 'my_trips' %}">My Trips</a>
+      <a href="{% url 'emergency_contact_list' %}">Emergency Contacts</a>
+    {% else %}
+      <a href="{% url 'dashboard_home' %}">Dashboard</a>
+      <a href="{% url 'admin_vehicle_dashboard' %}">Vehicles</a>
+      <a href="{% url 'emergency_dashboard' %}">Emergency</a>
+      <a href="{% url 'report_dashboard' %}">Reports</a>
+    {% endif %}
+    <div class="theme-toggle-row">
+      <span>Theme</span>
+      <button type="button" class="theme-toggle" data-theme-toggle-mobile aria-label="Toggle light/dark mode">
+        <span class="material-symbols-outlined i-moon">dark_mode</span>
+        <span class="material-symbols-outlined i-sun">light_mode</span>
+      </button>
+    </div>
+    <form method="post" action="{% url 'logout' %}">
+      {% csrf_token %}
+      <button type="submit">Logout</button>
+    </form>
+  {% else %}
+    <a href="{% url 'login' %}">Login</a>
+    <a href="{% url 'register' %}">Register</a>
+    <div class="theme-toggle-row">
+      <span>Theme</span>
+      <button type="button" class="theme-toggle" data-theme-toggle-mobile aria-label="Toggle light/dark mode">
+        <span class="material-symbols-outlined i-moon">dark_mode</span>
+        <span class="material-symbols-outlined i-sun">light_mode</span>
+      </button>
+    </div>
+  {% endif %}
+  <button class="btn btn-primary" data-open-modal>Verify Vehicle</button>
+</div>
+
+<main>
+  {% if messages %}
+    <div class="page-messages">
+      {% for message in messages %}
+        <div class="msg msg-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+  <div class="main-wrap">
+    {% block content %}{% endblock %}
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="logo" href="{% url 'home' %}"><svg viewBox="0 0 36 36" fill="none"><path d="M18 2l13 4.8v9.4c0 8.6-5.5 14.6-13 17.8C10.5 30.8 5 24.8 5 16.2V6.8L18 2z" fill="#0d5c3b"/><rect x="12" y="11" width="5" height="5" fill="#2fe38d"/><rect x="19" y="11" width="5" height="5" fill="#eaf5ef"/><rect x="12" y="18" width="5" height="5" fill="#eaf5ef"/><rect x="19" y="18" width="5" height="5" fill="#2fe38d"/></svg>Ride<em>Garde</em></a>
+        <p>A civic trust &amp; security portal verifying commercial vehicles and drivers across Nigeria.</p>
+      </div>
+      <div>
+        <h4>Platform</h4>
+        <a href="#how">How it works</a>
+        <a href="#features">Safety features</a>
+        <a href="#demo">Live demo</a>
+        <a href="#" data-open-modal>Verify vehicle</a>
+      </div>
+      <div>
+        <h4>Partners</h4>
+        <a href="#cta">Register your fleet</a>
+        <a href="#cta">Partner with us</a>
+        <a href="#partners">Trusted institutions</a>
+      </div>
+      <div>
+        <h4>Emergency</h4>
+        <a href="tel:112">SOS Line — 112</a>
+        <a href="mailto:help@rideguarde.com">help@rideguarde.com</a>
+        <a href="#demo">24/7 Command Center</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© {% now "Y" %} RideGarde · rideguarde.com</span>
+      <span>SCAN · VERIFY · SHARE · RIDE</span>
+    </div>
+  </div>
+</footer>
+
+<div class="modal" id="verifyModal" data-state="idle" role="dialog" aria-modal="true" aria-label="Verify a vehicle">
+  <div class="modal-backdrop" data-close-modal></div>
+  <div class="modal-card">
+    <button class="modal-close" data-close-modal aria-label="Close">✕</button>
+    <span class="eyebrow">Instant check</span>
+    <h3>Verify a vehicle</h3>
+    <p class="msub">Enter the plate number to run a live check against the registry.</p>
+    <div class="mform">
+      <input id="plateInput" type="text" placeholder="e.g. SMK-123-XY" autocomplete="off">
+      <button id="runCheck">Check</button>
+    </div>
+    <div class="mscan">
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#2fe38d" stroke-width="2" stroke-linecap="round"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4z"/><path d="M14 14h3v3h-3zM20 17v3h-3"/></svg>
+      <div class="bar"><i></i></div>
+      <p>Contacting National Security DB…</p>
+    </div>
+    <div class="mresult">
+      <div class="top">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 5-6"/></svg>
+        <div><b>Vehicle Verified</b><div class="rid">REGISTRY MATCH · SR-NG-8842</div></div>
+      </div>
+      <div class="rows">
+        <div>Driver — <b>Oluwaseun Adeyemi</b></div>
+        <div>Vehicle — <b>Toyota Corolla (Yellow)</b></div>
+        <div>Plate — <b id="resultPlate">SMK-123-XY</b></div>
+        <div>Fleet — <b>NURTW Lagos Island</b></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  function getTheme(){return document.documentElement.getAttribute('data-theme')==='dark'?'dark':'light';}
+  function setTheme(t){if(t!=='dark'&&t!=='light')t='light';document.documentElement.setAttribute('data-theme',t);try{localStorage.setItem('ridegarde-theme',t);}catch(e){}}
+  function toggleTheme(){setTheme(getTheme()==='dark'?'light':'dark');}
+  var desktopToggle=document.getElementById('themeToggle');
+  if(desktopToggle)desktopToggle.addEventListener('click',toggleTheme);
+  document.querySelectorAll('[data-theme-toggle-mobile]').forEach(function(b){b.addEventListener('click',toggleTheme);});
+
+  var navEl=document.getElementById('siteNav');
+  window.addEventListener('scroll',function(){navEl.classList.toggle('scrolled',window.scrollY>10);},{passive:true});
+  var burger=document.getElementById('burger'),mMenu=document.getElementById('mobileMenu');
+  burger.addEventListener('click',function(){mMenu.classList.toggle('open');});
+  mMenu.querySelectorAll('a').forEach(function(el){el.addEventListener('click',function(){mMenu.classList.remove('open');});});
+  var io=new IntersectionObserver(function(entries){entries.forEach(function(en){if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);}});},{threshold:.15});
+  document.querySelectorAll('.reveal').forEach(function(el){io.observe(el);});
+  function runCount(el){
+    var target=parseInt(el.getAttribute('data-count'),10),suffix=el.getAttribute('data-suffix')||'',t0=null,dur=1600;
+    function tick(ts){if(!t0)t0=ts;var p=Math.min((ts-t0)/dur,1);p=1-Math.pow(1-p,3);
+      el.textContent=Math.round(target*p).toLocaleString('en-US')+suffix;
+      if(p<1)requestAnimationFrame(tick);}
+    requestAnimationFrame(tick);
+  }
+  var cio=new IntersectionObserver(function(entries){entries.forEach(function(en){if(en.isIntersecting){runCount(en.target);cio.unobserve(en.target);}});},{threshold:.5});
+  document.querySelectorAll('[data-count]').forEach(function(el){cio.observe(el);});
+  var modal=document.getElementById('verifyModal'),plateInput=document.getElementById('plateInput'),runBtn=document.getElementById('runCheck'),resultPlate=document.getElementById('resultPlate'),scanTimer=null;
+  function openModal(){modal.classList.add('open');modal.setAttribute('data-state','idle');setTimeout(function(){plateInput.focus();},250);}
+  function closeModal(){modal.classList.remove('open');if(scanTimer)clearTimeout(scanTimer);}
+  document.querySelectorAll('[data-open-modal]').forEach(function(b){b.addEventListener('click',function(e){e.preventDefault();openModal();});});
+  document.querySelectorAll('[data-close-modal]').forEach(function(b){b.addEventListener('click',closeModal);});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal();});
+  runBtn.addEventListener('click',function(){
+    var val=plateInput.value.trim()||'SMK-123-XY';
+    modal.setAttribute('data-state','scanning');
+    scanTimer=setTimeout(function(){
+      resultPlate.textContent=val.toUpperCase();
+      modal.setAttribute('data-state','result');
+    },1700);
+  });
+  plateInput.addEventListener('keydown',function(e){if(e.key==='Enter')runBtn.click();});
+})();
+</script>
+</body>
+</html>

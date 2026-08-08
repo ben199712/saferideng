@@ -44,7 +44,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'ordering': ['-timestamp'],
-                'indexes': [models.Index(fields=['trip_share', 'timestamp'], name='apps_tracking_locationtrip_share_timestamp_2008a2_idx')],
+                'indexes': [models.Index(fields=['trip_share', 'timestamp'], name='apps_tracking_locationtrip_shayour-resend-api-key-here')],
             },
         ),
     ]

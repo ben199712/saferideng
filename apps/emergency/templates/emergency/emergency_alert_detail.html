@@ -44,6 +44,20 @@
         {% include "partials/info_tile.html" with label="Trip Status" value=alert.trip.get_trip_status_display wrapper_class="" %}
         {% include "partials/info_tile.html" with label="Started" value=alert.trip.started_at|date:"M d, Y h:i A" wrapper_class="" %}
       </div>
+      {% if alert.details_snapshot %}
+        <div class="mt-5 rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-5">
+          <div class="text-xs font-semibold uppercase tracking-[0.04em] text-on-surface-variant mb-2">Live Tracking</div>
+          <div class="text-sm text-on-surface-variant">
+            <div><span class="font-semibold text-on-surface">Latitude:</span> {{ alert.details_snapshot.location.latitude|default:"-" }}</div>
+            <div><span class="font-semibold text-on-surface">Longitude:</span> {{ alert.details_snapshot.location.longitude|default:"-" }}</div>
+            <div class="mt-3">
+              <a href="{{ alert.details_snapshot.trip.live_tracking_url }}" target="_blank" rel="noreferrer" class="inline-flex items-center justify-center rounded-xl bg-[#2563EB] px-4 py-2 text-white font-semibold hover:bg-[#1d4ed8] transition">
+                Open Live Tracking
+              </a>
+            </div>
+          </div>
+        </div>
+      {% endif %}
     </div>
 
     <div class="space-y-6">

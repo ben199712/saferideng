@@ -1,3 +1,5 @@
+from datetime import date, timedelta
+
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
@@ -27,9 +29,11 @@ class DashboardAuthorizationTests(TestCase):
         self.profile = DriverProfile.objects.create(
             user=self.driver,
             license_number="ABC123456",
+            email="driver@example.com",
             vehicle_make="Toyota",
             vehicle_model="Corolla",
             vehicle_plate_number="ABC-123-XY",
+            driver_license_expiry_date=date.today() + timedelta(days=45),
             verification_status=DriverProfile.VerificationStatus.pending,
         )
 
@@ -68,3 +72,14 @@ class DashboardAuthorizationTests(TestCase):
         self.assertEqual(response.url, reverse("dashboard_home"))
         self.assertEqual(self.profile.verification_status, DriverProfile.VerificationStatus.verified)
         self.assertTrue(self.profile.is_approved)
+
+    def test_dashboard_shows_expiry_alerts(self):
+        client = Client()
+        client.force_login(self.admin)
+
+        response = client.get(reverse("dashboard_home"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Expiry Alerts")
+        self.assertContains(response, "Licenses Expiring Within 90 Days")
+        self.assertContains(response, "driver@example.com")

@@ -3,10 +3,10 @@
 {% block title %}{% if profile %}Update Driver Profile{% else %}Register Driver{% endif %} • SafeRide NG{% endblock %}
 
 {% block content %}
-<div class="max-w-5xl mx-auto">
-  {% include "partials/page_header.html" with title="Driver Registration" subtitle="Submit or update your license and legacy vehicle details for verification." %}
+<div class="max-w-6xl mx-auto">
+  {% include "partials/page_header.html" with title="Driver Registration" subtitle="Complete the full RideGuarde safety profile with verified identity, contact, and license details." %}
 
-  <div class="grid grid-cols-1 lg:grid-cols-[1.15fr_0.85fr] gap-6">
+  <div class="grid grid-cols-1 xl:grid-cols-[minmax(0,1.2fr)_360px] gap-6">
     <div class="rounded-[2rem] border border-outline-variant/40 bg-white p-6 md:p-8 shadow-soft">
       <div class="flex items-start justify-between gap-4 mb-8">
         <div>
@@ -14,7 +14,7 @@
             {% if profile %}Update Driver Profile{% else %}Register as a Driver{% endif %}
           </h2>
           <p class="text-sm text-on-surface-variant mt-2">
-            Fill in your driver record accurately. Updating your profile resets verification back to pending for review.
+            Fill in your records exactly as they appear on official documents. Sensitive data is encrypted at rest and reviewed by SafeRide operations.
           </p>
         </div>
         {% if profile %}
@@ -24,37 +24,176 @@
         {% endif %}
       </div>
 
-      <form method="post" class="space-y-5">
+      <form method="post" id="driver-register-form" data-registration-form class="space-y-8" novalidate>
         {% csrf_token %}
+        <div id="driver-form-global-feedback" class="hidden rounded-xl p-4 text-sm font-semibold mb-2" aria-live="polite" role="status"></div>
+        <script id="driver-form-csrf" type="application/json">{"csrf_field_name": "csrfmiddlewaretoken"}</script>
         {% if form.non_field_errors %}
           <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             {{ form.non_field_errors }}
           </div>
         {% endif %}
 
-        {% include "partials/form_field.html" with field=form.license_number label="License Number" wrapper_class="" %}
-        {% include "partials/form_field.html" with field=form.vehicle_make label="Vehicle Make" wrapper_class="" %}
-        {% include "partials/form_field.html" with field=form.vehicle_model label="Vehicle Model" wrapper_class="" %}
-        {% include "partials/form_field.html" with field=form.vehicle_plate_number label="Vehicle Plate Number" wrapper_class="" %}
+        <section class="space-y-5">
+          <div>
+            <h3 class="text-lg font-semibold text-primary">Personal Information</h3>
+            <p class="text-sm text-on-surface-variant mt-1">Required identity and residency data for safety verification.</p>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {% include "partials/form_field.html" with field=form.date_of_birth label="Date of Birth" help_text="Drivers must be at least 21 years old." wrapper_class="" %}
+            {% include "partials/form_field.html" with field=form.gender label="Gender" wrapper_class="" %}
+            {% include "partials/form_field.html" with field=form.phone_number label="Phone Number" help_text="Use E.164 format, e.g. +2348012345678." wrapper_class="" %}
+            {% include "partials/form_field.html" with field=form.alternative_phone_number label="Alternative Phone Number" help_text="Optional backup contact number." wrapper_class="" %}
+            {% include "partials/form_field.html" with field=form.email label="Email Address" help_text="Changing this email resets verification until it is reviewed again." wrapper_class="" %}
+            {% include "partials/form_field.html" with field=form.nationality label="Nationality" wrapper_class="" %}
+            {% include "partials/form_field.html" with field=form.state label="State" wrapper_class="" %}
+            {% include "partials/form_field.html" with field=form.lga label="Local Government Area" wrapper_class="" lga_field="1" %}
+            {% include "partials/form_field.html" with field=form.residential_address label="Residential Address" help_text="Minimum 10 characters for location verification." wrapper_class="md:col-span-2" %}
+          </div>
+        </section>
+
+        <section class="space-y-5">
+          <div>
+            <h3 class="text-lg font-semibold text-primary">Identity And License</h3>
+            <p class="text-sm text-on-surface-variant mt-1">These fields are validated and protected because they drive safety and compliance checks.</p>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {% include "partials/form_field.html" with field=form.nin label="National Identification Number (NIN)" help_text="Enter the 11-digit NIN issued by NIMC." wrapper_class="" %}
+            {% include "partials/form_field.html" with field=form.license_number label="Driver License Number" help_text="Enter the active FRSC driver license number." wrapper_class="" %}
+            {% include "partials/form_field.html" with field=form.driver_license_expiry_date label="Driver License Expiry Date" help_text="Operations receives expiry alerts 90 days before this date." wrapper_class="" %}
+            {% include "partials/form_field.html" with field=form.years_of_driving_experience label="Years of Driving Experience" help_text="Minimum 2 years, maximum 70 years." wrapper_class="" %}
+            {% include "partials/form_field.html" with field=form.transport_union label="Transport Union" wrapper_class="" %}
+            {% include "partials/form_field.html" with field=form.union_membership_number label="Union Membership Number" wrapper_class="" %}
+          </div>
+        </section>
+
+        <section class="space-y-5">
+          <div>
+            <h3 class="text-lg font-semibold text-primary">Legacy Vehicle Reference</h3>
+            <p class="text-sm text-on-surface-variant mt-1">These fields preserve compatibility with the current dashboard while vehicle registration remains a separate workflow.</p>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {% include "partials/form_field.html" with field=form.vehicle_make label="Vehicle Make" wrapper_class="" %}
+            {% include "partials/form_field.html" with field=form.vehicle_model label="Vehicle Model" wrapper_class="" %}
+            {% include "partials/form_field.html" with field=form.vehicle_plate_number label="Vehicle Plate Number" wrapper_class="" %}
+          </div>
+        </section>
+
+        <section class="space-y-5">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <h3 class="text-lg font-semibold text-primary">Supporting Documents</h3>
+              <p class="text-sm text-on-surface-variant mt-1">Upload the documents needed for review. Required documents are marked and can be replaced before approval.</p>
+            </div>
+            <div class="text-sm text-on-surface-variant">
+              Allowed files: `JPG`, `PNG`, `WEBP`, `PDF`
+            </div>
+          </div>
+
+          <div id="document-upload-feedback" class="hidden rounded-xl border px-4 py-3 text-sm"></div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {% for item in document_items %}
+              <div class="rounded-[1.5rem] border border-outline-variant/40 bg-surface-container-lowest p-5 shadow-sm" data-document-card data-document-type="{{ item.key }}">
+                <div class="flex items-start justify-between gap-3">
+                  <div>
+                    <h4 class="font-semibold text-on-surface">{{ item.label }}</h4>
+                    {% if item.required %}
+                      <p class="text-xs text-red-600 mt-1">Required document</p>
+                    {% else %}
+                      <p class="text-xs text-on-surface-variant mt-1">Optional document</p>
+                    {% endif %}
+                  </div>
+                  {% if item.document %}
+                    <span class="inline-flex items-center rounded-full bg-green-50 border border-green-200 px-3 py-1 text-xs font-semibold text-green-700">Uploaded</span>
+                  {% else %}
+                    <span class="inline-flex items-center rounded-full bg-amber-50 border border-amber-200 px-3 py-1 text-xs font-semibold text-amber-700">Pending</span>
+                  {% endif %}
+                </div>
+
+                <div class="mt-4 rounded-2xl border border-outline-variant/30 bg-white p-3 min-h-[220px] flex flex-col justify-between">
+                  {% if item.document %}
+                    {% if item.document.preview_kind == "image" %}
+                      <img src="{% url 'driver_document_file' item.document.pk %}" alt="{{ item.label }}" class="h-40 w-full rounded-xl object-cover border border-outline-variant/20" />
+                    {% elif item.document.preview_kind == "pdf" %}
+                      <iframe src="{% url 'driver_document_file' item.document.pk %}" title="{{ item.label }}" class="h-40 w-full rounded-xl border border-outline-variant/20 bg-surface-container-low"></iframe>
+                    {% else %}
+                      <div class="h-40 rounded-xl border border-dashed border-outline-variant/40 bg-surface-container-low flex flex-col items-center justify-center text-center px-4">
+                        <span class="material-symbols-outlined text-4xl text-on-surface-variant">description</span>
+                        <p class="text-sm font-semibold text-on-surface mt-2">{{ item.document.original_file_name }}</p>
+                      </div>
+                    {% endif %}
+                  {% else %}
+                    <div class="h-40 rounded-xl border border-dashed border-outline-variant/40 bg-surface-container-low flex flex-col items-center justify-center text-center px-4">
+                      <span class="material-symbols-outlined text-4xl text-on-surface-variant">upload_file</span>
+                      <p class="text-sm font-semibold text-on-surface mt-2">No file uploaded yet</p>
+                      <p class="text-xs text-on-surface-variant mt-1">Choose an image or PDF to continue.</p>
+                    </div>
+                  {% endif %}
+
+                  <div class="mt-4 text-xs text-on-surface-variant space-y-1">
+                    {% if item.document %}
+                      <p><span class="font-semibold text-on-surface">File:</span> {{ item.document.original_file_name }}</p>
+                      <p><span class="font-semibold text-on-surface">Size:</span> {{ item.document.formatted_size }}</p>
+                      <p><span class="font-semibold text-on-surface">Uploaded:</span> {{ item.document.uploaded_at|date:"M d, Y H:i" }}</p>
+                      <p><span class="font-semibold text-on-surface">Scan:</span> {{ item.document.get_malware_scan_status_display }}</p>
+                    {% else %}
+                      <p>Upload timestamp and metadata will appear here after a successful upload.</p>
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="mt-4 space-y-3" data-upload-form data-upload-url="{% url 'driver_document_upload' %}" data-delete-url="{% if item.document %}{% url 'driver_document_delete' item.document.pk %}{% endif %}">
+                  <input type="hidden" name="document_type" value="{{ item.key }}" data-document-type />
+                  <input type="file" name="file" accept=".jpg,.jpeg,.png,.webp,.pdf" class="block w-full text-sm text-on-surface-variant" />
+                  <div class="h-2 rounded-full bg-surface-container overflow-hidden hidden" data-progress-shell>
+                    <div class="h-full rounded-full bg-primary transition-all" style="width: 0%" data-progress-bar></div>
+                  </div>
+                  <div class="flex flex-wrap gap-3">
+                    <button type="button" class="inline-flex items-center justify-center rounded-xl bg-[#2563EB] px-4 py-2.5 text-white font-semibold hover:bg-[#1d4ed8] transition active:scale-[0.98]" data-upload-trigger>
+                      {% if item.document %}Replace File{% else %}Upload File{% endif %}
+                    </button>
+                    {% if item.document %}
+                      <a href="{% url 'driver_document_file' item.document.pk %}" target="_blank" rel="noreferrer" class="inline-flex items-center justify-center rounded-xl border border-outline-variant/60 bg-white px-4 py-2.5 text-primary font-semibold hover:bg-surface-container-low transition active:scale-[0.98]">
+                        Preview
+                      </a>
+                      <button type="button" class="inline-flex items-center justify-center rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-red-700 font-semibold hover:bg-red-100 transition active:scale-[0.98]" data-delete-trigger>
+                        Delete
+                      </button>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </section>
 
         <div class="flex flex-col sm:flex-row gap-3 pt-2">
-          <button type="submit" class="inline-flex items-center justify-center rounded-xl bg-[#2563EB] px-5 py-3 text-white font-semibold shadow-sm hover:bg-[#1d4ed8] hover:shadow-md transition active:scale-[0.98]">
-            {% if profile %}Update and Re-submit{% else %}Submit Driver Profile{% endif %}
+          <button type="submit" data-submit-btn class="inline-flex items-center justify-center gap-2 rounded-xl bg-[#2563EB] px-5 py-3 text-white font-semibold shadow-sm hover:bg-[#1d4ed8] hover:shadow-md transition active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed">
+            <span class="material-symbols-outlined text-[18px] !leading-none" data-submit-icon style="display:none">progress_activity</span>
+            <span data-submit-label>
+              {% if profile %}Update and Re-submit{% else %}Submit Driver Profile{% endif %}
+            </span>
           </button>
           <a href="{% url 'driver_profile' %}" class="inline-flex items-center justify-center rounded-xl border border-outline-variant/60 bg-white px-5 py-3 text-primary font-semibold hover:bg-surface-container-low transition active:scale-[0.98]">
             Cancel
           </a>
         </div>
       </form>
+
+      <script type="application/json" id="driver-form-navigation">
+        {"success_url": "{% url 'driver_profile' %}", "home_url": "{% url 'home' %}"}
+      </script>
     </div>
 
     <div class="space-y-6">
       <div class="rounded-[2rem] border border-outline-variant/40 bg-white p-6 shadow-soft">
         <h3 class="text-lg font-semibold text-primary">Before You Submit</h3>
         <div class="space-y-4 mt-5 text-sm text-on-surface-variant">
-          <p>Use the exact details that match your official driver and vehicle records.</p>
-          <p>Profile updates are reviewed again, so approved drivers return to pending status until re-verified.</p>
-          <p>Once approved, you can proceed to register vehicles and generate verification QR codes.</p>
+          <p>All required identity and contact fields must match your official records.</p>
+          <p>Driver license expiry is monitored so SafeRide can alert admins before renewal is due.</p>
+          <p>Updating your profile returns verification to pending for a fresh compliance review.</p>
+          <p>Profile email changes also reset account verification until operations validates the new address.</p>
         </div>
       </div>
 
@@ -64,12 +203,436 @@
           <div>
             <h3 class="font-semibold text-primary">Verification Process</h3>
             <p class="text-sm text-on-surface-variant mt-1">
-              SafeRide reviews submitted driver profiles before they become approved for platform use.
+              RideGuarde uses your NIN, license, and union data to support manual and system-assisted compliance checks before approval.
             </p>
           </div>
         </div>
       </div>
+
+      <div class="rounded-[2rem] border border-amber-100 bg-amber-50 p-6 shadow-sm">
+        <h3 class="font-semibold text-amber-900">Privacy Safeguards</h3>
+        <p class="text-sm text-amber-800 mt-2">
+          Phone numbers, residential address, NIN, and driver license number are encrypted at rest before they are stored in the database.
+        </p>
+      </div>
     </div>
   </div>
 </div>
+
+{{ state_lga_mapping|json_script:"state-lga-data" }}
+<script>
+  (() => {
+    function safeParseMapping() {
+      try {
+        const script = document.getElementById("state-lga-data")
+          || document.querySelector('script[id="state-lga-data"]');
+        if (!script) {
+          console.warn("[State/LGA] state-lga-data JSON script not found on page.");
+          return {};
+        }
+        const raw = script.textContent || script.innerHTML || "";
+        // Parse 1: the script content
+        let parsed = JSON.parse(raw || "{}");
+        // PARSE 2: Django bug defense — if we passed json.dumps(string) through
+        // |json_script the result is a quoted JSON string inside the element.
+        // Re-parse until we get an actual object.
+        let depth = 0;
+        while (typeof parsed === "string" && depth < 3) {
+          try { parsed = JSON.parse(parsed); depth += 1; }
+          catch (_) { break; }
+        }
+        if (Array.isArray(parsed)) {
+          console.warn("[State/LGA] Mapping resolved to an array instead of object; coercing.");
+          return {};
+        }
+        if (!parsed || typeof parsed !== "object") return {};
+        return parsed;
+      } catch (err) {
+        console.error("[State/LGA] Failed to parse mapping JSON:", err);
+        return {};
+      }
+    }
+    const mapping = safeParseMapping();
+
+    function findSelect(primaryId, nameHint) {
+      // Primary: id-based lookups (Django always writes `id="id_state"` / `id="id_lga"` by default)
+      const byId = document.getElementById(primaryId)
+        || document.querySelector("select#" + primaryId);
+      if (byId && byId.tagName === "SELECT") return byId;
+
+      // Secondary: by HTML form-field name (also stable — Django writes name="state" / "lga")
+      const byName = document.querySelector('select[name="' + nameHint + '"]');
+      if (byName) return byName;
+
+      // Tertiary: data attribute (future-proof)
+      const byData = document.querySelector('select[data-' + nameHint + '-field]');
+      if (byData) return byData;
+
+      // LAST RESORT (index fallback): in DriverRegistrationForm the select order is
+      //   0=gender  1=state  2=lga  3=nationality  4=transport_union
+      const allSelects = document.querySelectorAll("select");
+      const fallbackIdx = nameHint === "state" ? 1 : nameHint === "lga" ? 2 : -1;
+      if (fallbackIdx >= 0 && allSelects[fallbackIdx]) return allSelects[fallbackIdx];
+      return null;
+    }
+    const stateField = findSelect("id_state", "state");
+    const lgaField = findSelect("id_lga", "lga");
+    const lgaHint = document.querySelector("[data-lga-wrapper] p");
+
+    // --- DIAGNOSTIC: compare first 6 <option> values vs mapping keys ---
+    (function diagnosticCompare() {
+      const stateOpts = stateField
+        ? Array.from(stateField.options)
+            .filter((o) => o.value && o.value.trim())
+            .slice(0, 6)
+            .map((o) => o.value)
+        : [];
+      const mapHead = Object.keys(mapping || {}).slice(0, 6);
+      const parsedType = Array.isArray(mapping) ? "array" : (mapping === null ? "null" : typeof mapping);
+      console.info("[State/LGA] value comparison", {
+        parsed_type: parsedType,
+        mapping_key_count: Object.keys(mapping || {}).length,
+        state_option_values: stateOpts,
+        mapping_keys_head: mapHead,
+        first_mapping_entry_lgas: (mapping && mapHead.length) ? (mapping[mapHead[0]] || []).slice(0, 3) : [],
+      });
+    })();
+
+    function normalize(key) {
+      return String(key || "")
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, " ")
+        .replace(/[\-_\u2013\u2014]/g, " ")
+        .replace(/[^a-z0-9 ]/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+    function buildNormalizedIndex(rawMap) {
+      const idx = new Map();
+      Object.entries(rawMap || {}).forEach(([k, v]) => {
+        if (!k) return;
+        const list = Array.isArray(v) ? v : [];
+        idx.set(normalize(k), list);
+        idx.set(k.trim(), list);
+      });
+      return idx;
+    }
+    const lgaIndex = buildNormalizedIndex(mapping);
+
+    function getLgasForState(stateVal) {
+      if (!stateVal) return [];
+      if (mapping[stateVal]) return mapping[stateVal];
+      const norm = normalize(stateVal);
+      if (lgaIndex.has(norm)) return lgaIndex.get(norm);
+      for (const key of Object.keys(mapping)) {
+        const k = normalize(key);
+        if (k.startsWith(norm) || norm.startsWith(k)) return mapping[key];
+      }
+      const tokens = norm.split(" ").filter(Boolean);
+      if (tokens.length) {
+        for (const key of Object.keys(mapping)) {
+          const kTokens = normalize(key).split(" ").filter(Boolean);
+          if (tokens.every((t) => kTokens.indexOf(t) !== -1)) return mapping[key];
+        }
+      }
+      return [];
+    }
+
+    const uploadForms = Array.from(document.querySelectorAll("[data-upload-form]"));
+    const feedbackBox = document.getElementById("document-upload-feedback");
+
+    if (!stateField || !lgaField) {
+      console.warn("[State/LGA] Could not locate selectors on this page.", { stateField: !!stateField, lgaField: !!lgaField });
+      return;
+    }
+
+    function updateLgaChoices(preserveCurrent) {
+      const selected = stateField.value || "";
+      const current = preserveCurrent !== false ? lgaField.value : "";
+      const lgas = getLgasForState(selected);
+
+      lgaField.innerHTML = "";
+
+      if (!selected || !lgas.length) {
+        const placeholder = document.createElement("option");
+        placeholder.value = "";
+        placeholder.textContent = selected
+          ? "\u26A0 No LGAs found for " + selected
+          : "\u2190 Select a state above to unlock LGAs";
+        placeholder.disabled = !!selected;
+        lgaField.appendChild(placeholder);
+        if (lgaHint) {
+          lgaHint.classList.remove("hidden");
+          lgaHint.style.display = selected ? "none" : "";
+        }
+        lgaField.disabled = !selected;
+        lgaField.setAttribute("aria-invalid", selected ? "true" : "false");
+        lgaField.dataset.state = selected ? (lgas.length ? "ready" : "empty") : "awaiting-state";
+        return;
+      }
+
+      const placeholder = document.createElement("option");
+      placeholder.value = "";
+      placeholder.textContent = "Select an LGA from " + selected + " (" + lgas.length + ")";
+      lgaField.appendChild(placeholder);
+
+      lgas.forEach((lga) => {
+        const option = document.createElement("option");
+        option.value = String(lga);
+        option.textContent = String(lga);
+        if (String(lga) === String(current)) option.selected = true;
+        lgaField.appendChild(option);
+      });
+
+      if (lgaHint) {
+        lgaHint.classList.add("hidden");
+        lgaHint.style.display = "none";
+      }
+      lgaField.disabled = false;
+      lgaField.setAttribute("aria-invalid", "false");
+      lgaField.dataset.state = "ready";
+    }
+
+    function onStateChanged() {
+      lgaField.value = "";
+      updateLgaChoices(false);
+      try { lgaField.focus({ preventScroll: true }); } catch (_) {}
+    }
+
+    stateField.addEventListener("change", onStateChanged);
+    stateField.addEventListener("input", onStateChanged);
+    stateField.addEventListener("blur", () => updateLgaChoices(true));
+    document.addEventListener("DOMContentLoaded", () => updateLgaChoices(true));
+    updateLgaChoices(true);
+
+    console.info("[State/LGA] Ready.", {
+      states_available: Object.keys(mapping).length,
+      state_field: (stateField && (stateField.id || stateField.name)) || "unknown",
+      lga_field: (lgaField && (lgaField.id || lgaField.name)) || "unknown",
+    });
+
+    function setFeedback(message, variant) {
+      if (!feedbackBox) return;
+      feedbackBox.classList.remove("hidden", "border-green-200", "bg-green-50", "text-green-700", "border-red-200", "bg-red-50", "text-red-700");
+      if (variant === "error") feedbackBox.classList.add("border-red-200", "bg-red-50", "text-red-700");
+      else feedbackBox.classList.add("border-green-200", "bg-green-50", "text-green-700");
+      feedbackBox.textContent = message;
+    }
+
+    const csrfToken = (document.querySelector("input[name='csrfmiddlewaretoken']") || {}).value || "";
+
+    uploadForms.forEach((form) => {
+      const uploadTrigger = form.querySelector("[data-upload-trigger]");
+      const deleteTrigger = form.querySelector("[data-delete-trigger]");
+
+      uploadTrigger && uploadTrigger.addEventListener("click", () => {
+        const progressShell = form.querySelector("[data-progress-shell]");
+        const progressBar = form.querySelector("[data-progress-bar]");
+        const fileInput = form.querySelector("input[type='file']");
+        const documentTypeInput = form.querySelector("[data-document-type]");
+        if (!fileInput || !fileInput.files || !fileInput.files.length) {
+          setFeedback("Choose a file before uploading.", "error");
+          return;
+        }
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", form.dataset.uploadUrl);
+        xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+        if (progressShell) progressShell.classList.remove("hidden");
+        if (progressBar) progressBar.style.width = "0%";
+
+        xhr.upload.addEventListener("progress", (progressEvent) => {
+          if (!progressEvent.lengthComputable) return;
+          if (progressBar) {
+            const percent = Math.round((progressEvent.loaded / progressEvent.total) * 100);
+            progressBar.style.width = percent + "%";
+          }
+        });
+
+        xhr.onreadystatechange = () => {
+          if (xhr.readyState !== XMLHttpRequest.DONE) return;
+          if (xhr.status >= 200 && xhr.status < 300) {
+            let response = {};
+            try { response = JSON.parse(xhr.responseText || "{}"); } catch (_) {}
+            setFeedback(response.message || "Document uploaded successfully.", "success");
+            window.setTimeout(() => window.location.reload(), 500);
+            return;
+          }
+          let message = "Upload failed. Please try again.";
+          try {
+            const payload = JSON.parse(xhr.responseText || "{}");
+            message = payload.error || payload.message || message;
+          } catch (_) { /* swallow */ }
+          if (progressShell) progressShell.classList.add("hidden");
+          setFeedback(message, "error");
+        };
+
+        const payload = new FormData();
+        payload.append("csrfmiddlewaretoken", csrfToken);
+        payload.append("document_type", documentTypeInput.value);
+        payload.append("file", fileInput.files[0]);
+        xhr.send(payload);
+      });
+
+      deleteTrigger && deleteTrigger.addEventListener("click", () => {
+        if (!form.dataset.deleteUrl || !window.confirm("Delete this uploaded document?")) return;
+        const deleteForm = new FormData();
+        deleteForm.append("csrfmiddlewaretoken", csrfToken);
+        fetch(form.dataset.deleteUrl, {
+          method: "POST",
+          body: deleteForm,
+          headers: { "X-Requested-With": "XMLHttpRequest" },
+        }).then(() => window.location.reload());
+      });
+    });
+
+    /* ===== AJAX profile submit: prevent page reload + inline errors ===== */
+    const regForm = document.getElementById("driver-register-form")
+      || document.querySelector("form[data-registration-form]");
+    const submitBtn = regForm && regForm.querySelector("[data-submit-btn]");
+    const submitIcon = submitBtn && submitBtn.querySelector("[data-submit-icon]");
+    const submitLabel = submitBtn && submitBtn.querySelector("[data-submit-label]");
+    const globalFeedback = document.getElementById("driver-form-global-feedback");
+    let navigationConfig = { success_url: null, home_url: "/" };
+    try {
+      const navScript = document.getElementById("driver-form-navigation");
+      if (navScript && navScript.textContent) navigationConfig = Object.assign(navigationConfig, JSON.parse(navScript.textContent));
+    } catch (_) {}
+
+    function showGlobalFeedback(message, variant) {
+      if (!globalFeedback) return;
+      globalFeedback.classList.remove(
+        "hidden",
+        "border-error", "bg-red-soft", "text-tertiary",
+        "border-primary", "bg-green-soft", "text-primary",
+      );
+      if (variant === "error") {
+        globalFeedback.classList.add("border-error", "bg-red-soft", "text-tertiary");
+      } else {
+        globalFeedback.classList.add("border-primary", "bg-green-soft", "text-primary");
+      }
+      globalFeedback.textContent = message || "";
+      globalFeedback.classList.remove("hidden");
+      globalFeedback.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function clearFieldErrors() {
+      if (!regForm) return;
+      regForm.querySelectorAll("[data-field-error]").forEach((el) => el.remove());
+      regForm.querySelectorAll("[aria-invalid='true']").forEach((el) => el.removeAttribute("aria-invalid"));
+      regForm.querySelectorAll(".has-field-error").forEach((el) => el.classList.remove("has-field-error"));
+    }
+
+    function renderFieldErrors(errorsDict) {
+      clearFieldErrors();
+      if (!regForm || !errorsDict || typeof errorsDict !== "object") return;
+      Object.entries(errorsDict).forEach(([fieldName, fieldErrors]) => {
+        if (!fieldErrors || !Array.isArray(fieldErrors) || !fieldErrors.length) return;
+        let targetWrapper = null;
+        // Non-field errors key is "__all__" / None => global handler already done
+        if (fieldName === "__all__" || fieldName === "non_field_errors" || !fieldName) {
+          const firstMsg = fieldErrors[0].message || String(fieldErrors[0]);
+          showGlobalFeedback(firstMsg, "error");
+          return;
+        }
+        const fieldInput = regForm.querySelector(
+          'select[name="' + fieldName + '"], input[name="' + fieldName + '"], textarea[name="' + fieldName + '"]',
+        ) || regForm.querySelector(
+          '[id="id_' + fieldName + '"]',
+        );
+        if (!fieldInput) return;
+        // Find nearest wrapper div (parent of label/input/helptext)
+        let wrapper = fieldInput.closest("div");
+        while (wrapper && wrapper !== regForm && wrapper.parentElement !== regForm && wrapper.querySelectorAll("label, input, select, textarea").length < 2) {
+          wrapper = wrapper.parentElement;
+        }
+        if (!wrapper) wrapper = fieldInput.parentElement;
+        wrapper.classList.add("has-field-error");
+        fieldInput.setAttribute("aria-invalid", "true");
+        const msg = (fieldErrors[0].message || String(fieldErrors[0])).replace(/\.$/, "");
+        const p = document.createElement("p");
+        p.setAttribute("data-field-error", fieldName);
+        p.className = "text-sm text-error mt-2";
+        p.textContent = "⚠ " + msg;
+        wrapper.appendChild(p);
+      });
+    }
+
+    function setSubmitting(submitting) {
+      if (!submitBtn) return;
+      submitBtn.disabled = !!submitting;
+      if (submitIcon) submitIcon.style.display = submitting ? "" : "none";
+      if (submitLabel) submitLabel.textContent = submitting
+        ? (submitting === true ? "Submitting…" : submitting)
+        : (submitLabel.dataset.original || submitLabel.textContent);
+      if (!submitLabel.dataset.original) submitLabel.dataset.original = submitLabel.textContent;
+      submitBtn.setAttribute("aria-busy", submitting ? "true" : "false");
+    }
+
+    if (regForm) {
+      // Guarantee initial LGA disabled on fresh load when state is empty
+      updateLgaChoices(true);
+
+      regForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        const formData = new FormData(regForm);
+
+        // Last-second LGA recovery: if an LGA option has value but the field
+        // was re-rendered disabled (post-failure render), re-enable to guarantee submit
+        if (lgaField && lgaField.disabled) lgaField.disabled = false;
+
+        clearFieldErrors();
+        showGlobalFeedback("Validating profile — one moment…", "success");
+        setSubmitting(true);
+
+        let response;
+        fetch(regForm.action || window.location.href, {
+          method: (regForm.getAttribute("method") || "post").toUpperCase(),
+          body: formData,
+          headers: { "X-Requested-With": "XMLHttpRequest" },
+          credentials: "same-origin",
+        })
+          .then(function (rawResp) {
+            response = rawResp;
+            const ctype = rawResp.headers.get("content-type") || "";
+            if (ctype.indexOf("application/json") !== -1) return rawResp.json();
+            return rawResp.text().then(function (htmlBody) {
+              // Non-json fallback — render failure page content into feedback
+              console.warn("[Submit] Expected JSON but got HTML. Showing generic error.", htmlBody ? htmlBody.length : 0);
+              return { ok: false, error: "Submission failed. Server returned HTML; expected JSON.", __html: htmlBody };
+            });
+          })
+          .then(function (payload) {
+            if (payload && payload.ok) {
+              showGlobalFeedback(payload.message || "Profile saved. Redirecting…", "success");
+              setSubmitting("Redirecting…");
+              try {
+                if (payload.redirect) { sessionStorage.setItem("dr_success_msg", payload.message || ""); }
+              } catch (_) {}
+              const target = payload.redirect || navigationConfig.success_url || navigationConfig.home_url || "/";
+              window.setTimeout(function () { window.location.assign(target); }, 500);
+              return;
+            }
+            // Not ok
+            setSubmitting(false);
+            if (payload && payload.errors) {
+              renderFieldErrors(payload.errors);
+            }
+            showGlobalFeedback(
+              (payload && payload.error) ? payload.error : "Submission failed. Please check highlighted fields.",
+              "error",
+            );
+            if (window.scrollTo) window.scrollTo({ top: 0, behavior: "smooth" });
+          })
+          .catch(function (networkError) {
+            console.error("[Submit] Network error:", networkError);
+            setSubmitting(false);
+            showGlobalFeedback("Could not reach the server. Please check your connection and try again.", "error");
+          });
+        return false;
+      }, true);  // useCapture so no third-party handler can fire first & trigger submit() reload
+    }
+  })();
+</script>
 {% endblock %}

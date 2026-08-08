@@ -1,11 +1,11 @@
 {% extends "layouts/base.html" %}
-{% block title %}Register • SafeRide NG{% endblock %}
+{% block title %}Register • RideGarde{% endblock %}
 {% block content %}
 <div class="max-w-3xl mx-auto">
-  <div class="rounded-[2rem] border border-outline-variant/40 bg-white p-6 md:p-8 shadow-soft">
+  <div class="card p-6 md:p-8 shadow-soft">
     <div class="mb-8">
-      <h2 class="text-3xl font-bold text-primary tracking-[-0.02em]">Create your driver account</h2>
-      <p class="text-sm text-on-surface-variant mt-2">Start your SafeRide NG verification profile and vehicle approval journey.</p>
+      <h2 class="text-3xl font-bold text-on-surface tracking-[-0.02em] font-display">Create your driver account</h2>
+      <p class="text-sm text-on-surface-variant mt-2">Start your RideGarde verification profile and vehicle approval journey.</p>
     </div>
 
     <form method="post" class="space-y-6">
@@ -27,14 +27,14 @@
         {% include "partials/form_field.html" with field=form.password2 label="Confirm Password" wrapper_class="" %}
       </div>
 
-      <button type="submit" class="w-full inline-flex items-center justify-center rounded-xl bg-[#2563EB] px-5 py-3 text-white font-semibold shadow-sm hover:bg-[#1d4ed8] hover:shadow-md transition active:scale-[0.98]">
+      <button type="submit" class="w-full btn btn-primary justify-center">
         Create account
       </button>
     </form>
 
     <div class="mt-6 text-sm text-center text-on-surface-variant">
       Already have an account?
-      <a href="{% url 'login' %}" class="font-semibold text-primary hover:text-[#1d4ed8]">Login</a>
+      <a href="{% url 'login' %}" class="font-semibold text-primary hover:text-primary/80">Login</a>
     </div>
   </div>
 </div>

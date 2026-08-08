@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+  <body style="font-family: Arial, sans-serif; line-height: 1.5; color: #1c1b1b;">
+    <h2 style="margin: 0 0 12px 0;">Approval required: {{ title }}</h2>
+    <p style="margin: 0 0 12px 0;">{{ summary }}</p>
+    {% if actor_email or actor_name %}
+      <p style="margin: 0 0 12px 0;">
+        <strong>User:</strong> {{ actor_name }} {{ actor_email }}
+      </p>
+    {% endif %}
+    {% if details %}
+      <ul style="margin: 0; padding-left: 18px;">
+        {% for item in details %}
+          <li>{{ item }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    <p style="margin: 16px 0 0 0; color: #43474f; font-size: 12px;">SafeRide NG</p>
+  </body>
+</html>

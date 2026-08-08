@@ -1,10 +1,19 @@
 <div class="{{ wrapper_class|default:'' }}">
   <label class="block text-xs font-semibold uppercase tracking-[0.04em] text-on-surface-variant mb-2">{{ label }}</label>
-  {{ field }}
+  {% if lga_field %}
+    <div data-lga-wrapper>
+      {{ field }}
+      <p class="text-xs text-on-surface-variant mt-1 data-lga-hint hidden" style="display:none">
+        ⚠️ Select a state above first to load LGAs for that state.
+      </p>
+    </div>
+  {% else %}
+    {{ field }}
+  {% endif %}
   {% if help_text %}
     <p class="text-xs text-on-surface-variant mt-2">{{ help_text }}</p>
   {% endif %}
   {% if field.errors %}
-    <p class="text-sm text-red-600 mt-2">{{ field.errors.0 }}</p>
+    <p class="text-sm text-error mt-2">{{ field.errors.0 }}</p>
   {% endif %}
 </div>

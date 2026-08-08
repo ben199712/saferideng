@@ -9,8 +9,8 @@ from django.views import View
 
 from accounts.models import User
 
-from .forms import EmergencyContactForm
-from .models import EmergencyAlert, EmergencyContact
+from .forms import EmergencyContactForm, SOSAuthorityContactForm
+from .models import EmergencyAlert, EmergencyContact, SOSAuthorityAccessLog, SOSAuthorityContact
 
 
 def is_admin_user(user):
@@ -25,6 +25,15 @@ class AdminRequiredMixin:
         if not is_admin_user(request.user):
             raise PermissionDenied
         return super().dispatch(request, *args, **kwargs)
+
+    def log_authority_access(self, request, action, authority_contact=None):
+        SOSAuthorityAccessLog.objects.create(
+            admin_user=request.user,
+            authority_contact=authority_contact,
+            action=action,
+            request_path=request.path,
+            ip_address=request.META.get("REMOTE_ADDR"),
+        )
 
 
 class EmergencyContactListView(View):
@@ -143,3 +152,71 @@ class EmergencyAlertResolveView(AdminRequiredMixin, View):
         alert.resolve()
         messages.success(request, "Emergency alert resolved.")
         return redirect(reverse("emergency_alert_detail", kwargs={"uuid": alert.uuid}))
+
+
+class SOSAuthorityContactListView(AdminRequiredMixin, View):
+    template_name = "emergency/sos_authority_contact_list.html"
+
+    def get(self, request):
+        self.log_authority_access(request, SOSAuthorityAccessLog.Actions.list)
+        contacts = SOSAuthorityContact.objects.order_by("authority_name")
+        return render(request, self.template_name, {"contacts": contacts})
+
+
+class SOSAuthorityContactCreateView(AdminRequiredMixin, View):
+    template_name = "emergency/sos_authority_contact_form.html"
+
+    def get(self, request):
+        self.log_authority_access(request, SOSAuthorityAccessLog.Actions.create)
+        return render(request, self.template_name, {"form": SOSAuthorityContactForm()})
+
+    def post(self, request):
+        self.log_authority_access(request, SOSAuthorityAccessLog.Actions.create)
+        form = SOSAuthorityContactForm(request.POST)
+        if not form.is_valid():
+            return render(request, self.template_name, {"form": form})
+        contact = form.save()
+        self.log_authority_access(request, SOSAuthorityAccessLog.Actions.create, authority_contact=contact)
+        messages.success(request, "SOS authority contact created.")
+        return redirect("sos_authority_contact_list")
+
+
+class SOSAuthorityContactUpdateView(AdminRequiredMixin, View):
+    template_name = "emergency/sos_authority_contact_form.html"
+
+    def get_contact(self, pk):
+        return get_object_or_404(SOSAuthorityContact.objects.all(), pk=pk)
+
+    def get(self, request, pk):
+        contact = self.get_contact(pk)
+        self.log_authority_access(request, SOSAuthorityAccessLog.Actions.update, authority_contact=contact)
+        return render(request, self.template_name, {"form": SOSAuthorityContactForm(instance=contact), "contact": contact})
+
+    def post(self, request, pk):
+        contact = self.get_contact(pk)
+        self.log_authority_access(request, SOSAuthorityAccessLog.Actions.update, authority_contact=contact)
+        form = SOSAuthorityContactForm(request.POST, instance=contact)
+        if not form.is_valid():
+            return render(request, self.template_name, {"form": form, "contact": contact})
+        form.save()
+        messages.success(request, "SOS authority contact updated.")
+        return redirect("sos_authority_contact_list")
+
+
+class SOSAuthorityContactDeleteView(AdminRequiredMixin, View):
+    template_name = "emergency/sos_authority_contact_confirm_delete.html"
+
+    def get_contact(self, pk):
+        return get_object_or_404(SOSAuthorityContact.objects.all(), pk=pk)
+
+    def get(self, request, pk):
+        contact = self.get_contact(pk)
+        self.log_authority_access(request, SOSAuthorityAccessLog.Actions.delete, authority_contact=contact)
+        return render(request, self.template_name, {"contact": contact})
+
+    def post(self, request, pk):
+        contact = self.get_contact(pk)
+        self.log_authority_access(request, SOSAuthorityAccessLog.Actions.delete, authority_contact=contact)
+        contact.delete()
+        messages.success(request, "SOS authority contact deleted.")
+        return redirect("sos_authority_contact_list")

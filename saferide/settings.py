@@ -11,17 +11,43 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 import os
+import sys
 from pathlib import Path
+
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / ".env")
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "django-insecure-o*!8yr$2xp@^t&jpa-%766c$shfwyij219p)#nglf9t%v^atx^")
+# NEVER bake a default fallback secret into source — require DJANGO_SECRET_KEY env var.
+_SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "").strip()
+if not _SECRET_KEY:
+    # In interactive development (e.g. manage.py runserver) generate a throwaway
+    # per-process key. In production/management commands we refuse to start.
+    _is_interactive_dev = (
+        len(sys.argv) > 0
+        and any(sys.argv[0].endswith(s) for s in ("manage.py", "django-admin"))
+        and (len(sys.argv) < 2 or sys.argv[1] in {"runserver", "runserver_plus", "shell", "shell_plus", "check", "test"})
+    )
+    if _is_interactive_dev:
+        try:
+            from django.core.management.utils import get_random_secret_key
+            _SECRET_KEY = get_random_secret_key()
+        except Exception:  # pragma: no cover - Django import guard
+            import secrets
+            _SECRET_KEY = "django-insecure-" + secrets.token_urlsafe(38)
+    else:
+        raise RuntimeError(
+            "DJANGO_SECRET_KEY environment variable is required for production. "
+            "Copy .env.example -> .env and set DJANGO_SECRET_KEY to a long random string."
+        )
+SECRET_KEY = _SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DJANGO_DEBUG", "True") == "True"
@@ -41,6 +67,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "core",
     "accounts",
     "drivers",
     "dashboard",
@@ -132,12 +159,17 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+PRIVATE_DRIVER_DOCUMENTS_ROOT = BASE_DIR / "private_media" / "driver_documents"
+PRIVATE_DRIVER_DOCUMENTS_BACKUP_ROOT = BASE_DIR / "private_media_backup" / "driver_documents"
+DRIVER_DOCUMENT_MAX_UPLOAD_BYTES = int(os.environ.get("DRIVER_DOCUMENT_MAX_UPLOAD_BYTES", str(8 * 1024 * 1024)))
+DRIVER_DOCUMENT_MALWARE_SCAN_ENABLED = os.environ.get("DRIVER_DOCUMENT_MALWARE_SCAN_ENABLED", "False") == "True"
 
 AUTH_USER_MODEL = "accounts.User"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "admin:index"
 TEMPLATES[0]["DIRS"] = [BASE_DIR / "templates"]
+DRIVER_PII_ENCRYPTION_KEY = os.environ.get("DRIVER_PII_ENCRYPTION_KEY", SECRET_KEY)
 
 # Channels Configuration
 ASGI_APPLICATION = 'saferide.asgi.application'
@@ -149,4 +181,14 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "no-reply@rideguarde.com")
+SOS_SMS_PROVIDER = os.environ.get("SOS_SMS_PROVIDER", "console")
+SOS_SMS_HTTP_ENDPOINT = os.environ.get("SOS_SMS_HTTP_ENDPOINT", "")
+SOS_SMS_HTTP_AUTH_TOKEN = os.environ.get("SOS_SMS_HTTP_AUTH_TOKEN", "")
+SOS_SMS_HTTP_SENDER_ID = os.environ.get("SOS_SMS_HTTP_SENDER_ID", "SafeRide")
+
+RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
+RESEND_FROM_EMAIL = os.environ.get("RESEND_FROM_EMAIL", DEFAULT_FROM_EMAIL)
+ADMIN_NOTIFICATION_EMAILS = [email.strip() for email in os.environ.get("ADMIN_NOTIFICATION_EMAILS", "").split(",") if email.strip()]
 

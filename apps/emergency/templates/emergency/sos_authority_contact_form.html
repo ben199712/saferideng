@@ -1,0 +1,29 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}{% if contact %}Edit{% else %}Add{% endif %} SOS Authority • SafeRide NG{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+  {% include "partials/page_header.html" with title="SOS Authority Contact" subtitle="Configure a police or law enforcement contact for SOS alerts." %}
+
+  <div class="rounded-[2rem] border border-outline-variant/40 bg-white p-6 md:p-8 shadow-soft">
+    <form method="post" class="space-y-5">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+      {% include "partials/form_field.html" with field=form.authority_name label="Authority Name" wrapper_class="" %}
+      {% include "partials/form_field.html" with field=form.physical_jurisdiction label="Physical Jurisdiction" wrapper_class="" %}
+      {% include "partials/form_field.html" with field=form.official_email label="Official Email Address" wrapper_class="" %}
+      {% include "partials/form_field.html" with field=form.sms_phone_number label="SMS Phone Number" help_text="Use an active number that can receive emergency SMS alerts." wrapper_class="" %}
+      {% include "partials/form_field.html" with field=form.is_active label="Active" help_text="Inactive contacts will not receive alerts." wrapper_class="" %}
+
+      <div class="flex flex-col sm:flex-row gap-3 pt-4">
+        <button type="submit" class="inline-flex flex-1 items-center justify-center rounded-xl bg-[#2563EB] px-5 py-3 text-white font-semibold shadow-sm hover:bg-[#1d4ed8] transition active:scale-[0.98]">
+          {% if contact %}Update Authority{% else %}Create Authority{% endif %}
+        </button>
+        <a href="{% url 'sos_authority_contact_list' %}" class="inline-flex items-center justify-center rounded-xl border border-outline-variant/60 bg-white px-5 py-3 text-primary font-semibold hover:bg-surface-container-low transition">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+

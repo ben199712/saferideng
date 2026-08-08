@@ -27,15 +27,23 @@
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
         {% if profile_exists %}
-          {% include "partials/info_tile.html" with label="License Number" value=profile.license_number|default:"Not submitted" meta="Driver license record" %}
-          {% include "partials/info_tile.html" with label="Vehicle" value=legacy_vehicle_label meta="Legacy vehicle detail" %}
-          {% include "partials/info_tile.html" with label="Plate Number" value=profile.vehicle_plate_number|default:"Not submitted" meta="Legacy plate reference" %}
-          {% include "partials/info_tile.html" with label="Profile Updated" value=profile.updated_at|date:"M d, Y" meta=profile.updated_at|date:"H:i" %}
+          {% include "partials/info_tile.html" with label="Driver License Number" value=profile.license_number|default:"Not submitted" meta="Encrypted at rest" %}
+          {% include "partials/info_tile.html" with label="Primary Phone" value=profile.phone_number|default:"Not submitted" meta="E.164 verified contact" %}
+          {% include "partials/info_tile.html" with label="License Expiry" value=profile.driver_license_expiry_date|date:"M d, Y"|default:"Not submitted" meta="Admin alerted 90 days before expiry" %}
+          {% include "partials/info_tile.html" with label="Email Verification" value=profile.email|default:"Not submitted" meta=profile.email_verified|yesno:"Verified,Pending review" %}
+          {% include "partials/info_tile.html" with label="State / LGA" value=profile.state|default:"Not submitted" meta=profile.lga|default:"Select on registration" %}
+          {% include "partials/info_tile.html" with label="Union" value=profile.get_transport_union_display|default:"Not submitted" meta=profile.union_membership_number|default:"Membership pending" %}
+          {% include "partials/info_tile.html" with label="Experience" value=profile.years_of_driving_experience|default:"Not submitted" meta="Years behind the wheel" %}
+          {% include "partials/info_tile.html" with label="Legacy Vehicle" value=legacy_vehicle_label meta=profile.vehicle_plate_number|default:"No plate reference" %}
         {% else %}
-          {% include "partials/info_tile.html" with label="License Number" value="Not submitted" meta="Driver license record" %}
-          {% include "partials/info_tile.html" with label="Vehicle" value="Not submitted" meta="Legacy vehicle detail" %}
-          {% include "partials/info_tile.html" with label="Plate Number" value="Not submitted" meta="Legacy plate reference" %}
-          {% include "partials/info_tile.html" with label="Profile Updated" value="Not submitted" meta="Submit your driver profile" %}
+          {% include "partials/info_tile.html" with label="Driver License Number" value="Not submitted" meta="Encrypted at rest" %}
+          {% include "partials/info_tile.html" with label="Primary Phone" value="Not submitted" meta="E.164 verified contact" %}
+          {% include "partials/info_tile.html" with label="License Expiry" value="Not submitted" meta="Admin alerted 90 days before expiry" %}
+          {% include "partials/info_tile.html" with label="Email Verification" value="Not submitted" meta="Pending review" %}
+          {% include "partials/info_tile.html" with label="State / LGA" value="Not submitted" meta="Submit your residency data" %}
+          {% include "partials/info_tile.html" with label="Union" value="Not submitted" meta="Submit union details" %}
+          {% include "partials/info_tile.html" with label="Experience" value="Not submitted" meta="Years behind the wheel" %}
+          {% include "partials/info_tile.html" with label="Legacy Vehicle" value="Not submitted" meta="Legacy vehicle detail" %}
         {% endif %}
       </div>
 

@@ -1,0 +1,12 @@
+{{ title }}
+
+{{ summary }}
+
+{% if details %}
+Details:
+{% for item in details %}
+- {{ item }}
+{% endfor %}
+{% endif %}
+
+SafeRide NG

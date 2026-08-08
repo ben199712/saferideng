@@ -1,0 +1,16 @@
+Approval required: {{ title }}
+
+{{ summary }}
+
+{% if actor_email or actor_name %}
+User: {{ actor_name }} {{ actor_email }}
+{% endif %}
+
+{% if details %}
+Details:
+{% for item in details %}
+- {{ item }}
+{% endfor %}
+{% endif %}
+
+SafeRide NG

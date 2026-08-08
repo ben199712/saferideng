@@ -257,11 +257,24 @@
     const map = L.map("tracking-map", {
       zoomControl: true,
       preferCanvas: true,
+      minZoom: 1,
+      maxZoom: 19,
     }).setView([defaultLat, defaultLng], 14);
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      minZoom: 1,
       maxZoom: 19,
-      attribution: "&copy; OpenStreetMap contributors",
+      maxNativeZoom: 19,
+      subdomains: "abc",
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors. ' +
+        'Map data &copy; OpenStreetMap contributors, available under the ' +
+        '<a href="https://opendatacommons.org/licenses/odbl/" target="_blank" rel="noopener noreferrer">Open Database License (ODbL)</a>.',
+      keepBuffer: 4,
+      updateWhenIdle: true,
+      updateWhenZooming: false,
+      crossOrigin: true,
+      pane: "tilePane",
     }).addTo(map);
 
     const routeLine = L.polyline([], {

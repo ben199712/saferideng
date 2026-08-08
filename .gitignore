@@ -133,12 +133,46 @@ celerybeat.pid
 
 # Environments
 .env
+.env.*
+!.env.example
 .venv
 env/
 venv/
 ENV/
 env.bak/
 venv.bak/
+
+# User / private PII upload directories — NEVER commit user identity documents,
+# address proofs, NIN slips, passport scans, driver-licenses, QR codes.
+private_media/
+private_media_backup/
+vehicle_qrcodes/
+
+# Local AI/editor data
+.freebuff/
+.refact/
+
+# One-off local helper / debug / migration scripts (prefix anything local with "_")
+_*.py
+_*.ps1
+_*.json
+_*.txt
+_*.md
+!AGENTS.md
+
+# Temporary build / data files
+tmp_*
+*.tmp
+
+# Large JSON datasets that are regenerated at build time
+nigeria_lgas.json
+code.txt
+design.md
+tree_root.txt
+
+# IDE/editor
+.vscode/
+.idea/
 
 # Spyder project settings
 .spyderproject

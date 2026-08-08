@@ -4,202 +4,132 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{% block title %}SafeRide NG{% endblock %}</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
-
-    <script id="tailwind-config">
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
-            },
-            colors: {
-              primary: "#2563EB",
-              "primary-container": "#003366",
-              "primary-fixed": "#d5e3ff",
-              "primary-fixed-dim": "#a7c8ff",
-              secondary: "#1b6d24",
-              "secondary-container": "#a0f399",
-              tertiary: "#460003",
-              error: "#DC2626",
-              "error-container": "#ffdad6",
-              background: "#fcf9f8",
-              surface: "#fcf9f8",
-              "surface-bright": "#fcf9f8",
-              "surface-dim": "#dcd9d9",
-              "surface-container-lowest": "#ffffff",
-              "surface-container-low": "#f6f3f2",
-              "surface-container": "#f0edec",
-              "surface-container-high": "#ebe7e7",
-              "surface-container-highest": "#e5e2e1",
-              "surface-variant": "#e5e2e1",
-              "on-primary": "#ffffff",
-              "on-primary-container": "#799dd6",
-              "on-primary-fixed": "#001b3c",
-              "on-primary-fixed-variant": "#1f477b",
-              "on-secondary": "#ffffff",
-              "on-secondary-container": "#217128",
-              "on-tertiary": "#ffffff",
-              "on-tertiary-container": "#ff6d63",
-              "on-error": "#ffffff",
-              "on-error-container": "#93000a",
-              "on-background": "#1c1b1b",
-              "on-surface": "#1c1b1b",
-              "on-surface-variant": "#43474f",
-              outline: "#737780",
-              "outline-variant": "#c3c6d1",
-              inverse: "#313030",
-            },
-            fontSize: {
-              "display-lg": ["48px", { lineHeight: "60px", letterSpacing: "-0.02em" }],
-              "display-sm": ["36px", { lineHeight: "44px", letterSpacing: "-0.02em" }],
-              "headline-lg": ["30px", { lineHeight: "38px" }],
-              "headline-md": ["24px", { lineHeight: "32px" }],
-              "body-lg": ["18px", { lineHeight: "28px" }],
-              "body-md": ["16px", { lineHeight: "24px" }],
-              "label-md": ["14px", { lineHeight: "20px", letterSpacing: "0.01em" }],
-              caption: ["12px", { lineHeight: "16px" }],
-            },
-            spacing: {
-              xs: "4px",
-              sm: "8px",
-              md: "16px",
-              lg: "24px",
-              xl: "32px",
-              xxl: "48px",
-              "3xl": "64px",
-              "container-max": "1280px",
-            },
-            boxShadow: {
-              soft: "0 4px 20px rgba(0, 51, 102, 0.08)",
-              elevated: "0 10px 30px rgba(0, 51, 102, 0.12)",
-            },
-          },
-        },
-      };
+    <title>{% block title %}RideGarde — Civic Trust &amp; Security Portal{% endblock %}</title>
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem("ridegarde-theme");
+          var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+          var theme = stored ? stored : (prefersDark ? "dark" : "light");
+          document.documentElement.setAttribute("data-theme", theme);
+        } catch (e) {
+          document.documentElement.setAttribute("data-theme", "light");
+        }
+      })();
     </script>
-
-    <style>
-      body { background-color: #fcf9f8; color: #1c1b1b; }
-      .bg-grid-pattern {
-        background-image:
-          linear-gradient(to right, rgba(37, 99, 235, 0.06) 1px, transparent 1px),
-          linear-gradient(to bottom, rgba(37, 99, 235, 0.06) 1px, transparent 1px);
-        background-size: 32px 32px;
-      }
-      .glass {
-        background: rgba(255, 255, 255, 0.78);
-        backdrop-filter: blur(16px);
-      }
-      input:not([type="checkbox"]), select, textarea {
-        width: 100%;
-        border: 1px solid #c3c6d1;
-        border-radius: 12px;
-        background: #ffffff;
-        padding: 12px 14px;
-        color: #1c1b1b;
-        outline: none;
-        transition: border-color 160ms ease, box-shadow 160ms ease;
-      }
-      input:not([type="checkbox"]):focus, select:focus, textarea:focus {
-        border-color: #2563EB;
-        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.10);
-      }
-      .fade-in { animation: fadeIn 180ms ease-out; }
-      @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(4px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-    </style>
+    {% include "partials/theme_head.html" %}
   </head>
 
-  <body class="min-h-screen bg-background text-on-surface antialiased font-sans">
+  <body class="min-h-screen bg-background text-on-surface font-sans">
     <div class="min-h-screen flex flex-col">
-      <header class="sticky top-0 z-50 glass border-b border-outline-variant/40">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="flex items-center justify-between gap-4 py-4">
-            <a href="{% url 'home' %}" class="flex items-center gap-3 group">
-              <div class="w-10 h-10 rounded-2xl bg-[#2563EB] text-white flex items-center justify-center font-bold shadow-sm group-hover:shadow-md transition">
-                SR
-              </div>
-              <div>
-                <div class="font-bold text-primary leading-tight">SafeRide NG</div>
-                <div class="text-xs text-on-surface-variant leading-tight">Civic verification platform</div>
-              </div>
-            </a>
 
-            <nav class="hidden lg:flex items-center gap-1 text-sm">
-              <a href="{% url 'home' %}" class="px-3 py-2 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition">Home</a>
-              {% if user.is_authenticated %}
-                {% if user.role == "driver" %}
-                  <a href="{% url 'driver_profile' %}" class="px-3 py-2 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition">Driver Profile</a>
-                  <a href="{% url 'driver_vehicle_list' %}" class="px-3 py-2 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition">Vehicles</a>
-                  <a href="{% url 'my_trips' %}" class="px-3 py-2 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition">My Trips</a>
-                  <a href="{% url 'emergency_contact_list' %}" class="px-3 py-2 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition">Emergency Contacts</a>
-                {% else %}
-                  <a href="{% url 'dashboard_home' %}" class="px-3 py-2 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition">Dashboard</a>
-                  <a href="{% url 'admin_vehicle_dashboard' %}" class="px-3 py-2 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition">Vehicles</a>
-                  <a href="{% url 'emergency_dashboard' %}" class="px-3 py-2 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition">Emergency</a>
-                  <a href="{% url 'report_dashboard' %}" class="px-3 py-2 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition">Reports</a>
-                {% endif %}
-                <form method="post" action="{% url 'logout' %}" class="inline">
-                  {% csrf_token %}
-                  <button type="submit" class="ml-2 px-3 py-2 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition">Logout</button>
-                </form>
+      <div class="topbar">
+        <div class="wrap">
+          <span class="live"><span class="dot"></span> Civic Trust &amp; Security Portal</span>
+          <span class="hide-s">Synced with National Security Databases · NG</span>
+        </div>
+      </div>
+
+      <header class="nav" id="siteNav">
+        <div class="nav-inner">
+          <a class="logo" href="{% url 'home' %}" aria-label="RideGarde home">
+            <svg viewBox="0 0 36 36" fill="none"><path d="M18 2l13 4.8v9.4c0 8.6-5.5 14.6-13 17.8C10.5 30.8 5 24.8 5 16.2V6.8L18 2z" fill="#0d5c3b"/><path d="M18 2l13 4.8v9.4c0 8.6-5.5 14.6-13 17.8V2z" fill="#2fe38d" opacity=".25"/><rect x="12" y="11" width="5" height="5" fill="#2fe38d"/><rect x="19" y="11" width="5" height="5" fill="#eaf5ef"/><rect x="12" y="18" width="5" height="5" fill="#eaf5ef"/><rect x="19" y="18" width="5" height="5" fill="#2fe38d"/></svg>
+            Ride<em>Garde</em>
+          </a>
+
+          <nav class="nav-links">
+            <a href="{% url 'home' %}">Home</a>
+            {% if user.is_authenticated %}
+              {% if user.role == "driver" %}
+                <a href="{% url 'driver_profile' %}">Driver Profile</a>
+                <a href="{% url 'driver_vehicle_list' %}">Vehicles</a>
+                <a href="{% url 'my_trips' %}">My Trips</a>
+                <a href="{% url 'emergency_contact_list' %}">Emergency</a>
               {% else %}
-                <a href="{% url 'login' %}" class="px-3 py-2 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition">Login</a>
-                <a href="{% url 'register' %}" class="ml-2 px-3 py-2 rounded-xl bg-[#2563EB] text-white font-semibold hover:bg-[#1d4ed8] transition active:scale-[0.98]">Register</a>
+                <a href="{% url 'dashboard_home' %}">Dashboard</a>
+                <a href="{% url 'admin_vehicle_dashboard' %}">Vehicles</a>
+                <a href="{% url 'emergency_dashboard' %}">Emergency</a>
+                <a href="{% url 'report_dashboard' %}">Reports</a>
               {% endif %}
-            </nav>
+            {% else %}
+              <a href="{% url 'login' %}">Login</a>
+            {% endif %}
+          </nav>
 
-            <details class="lg:hidden relative">
-              <summary class="list-none cursor-pointer rounded-xl border border-outline-variant/40 px-3 py-2 text-sm font-semibold text-primary bg-surface-container-lowest">Menu</summary>
-              <div class="absolute right-0 mt-2 w-56 rounded-2xl border border-outline-variant/40 bg-white shadow-elevated p-2">
-                <a href="{% url 'home' %}" class="block rounded-xl px-3 py-2 text-sm text-on-surface hover:bg-surface-container-low">Home</a>
-                {% if user.is_authenticated %}
-                  {% if user.role == "driver" %}
-                    <a href="{% url 'driver_profile' %}" class="block rounded-xl px-3 py-2 text-sm text-on-surface hover:bg-surface-container-low">Driver Profile</a>
-                    <a href="{% url 'driver_vehicle_list' %}" class="block rounded-xl px-3 py-2 text-sm text-on-surface hover:bg-surface-container-low">Vehicles</a>
-                    <a href="{% url 'my_trips' %}" class="block rounded-xl px-3 py-2 text-sm text-on-surface hover:bg-surface-container-low">My Trips</a>
-                    <a href="{% url 'emergency_contact_list' %}" class="block rounded-xl px-3 py-2 text-sm text-on-surface hover:bg-surface-container-low">Emergency Contacts</a>
-                  {% else %}
-                    <a href="{% url 'dashboard_home' %}" class="block rounded-xl px-3 py-2 text-sm text-on-surface hover:bg-surface-container-low">Dashboard</a>
-                    <a href="{% url 'admin_vehicle_dashboard' %}" class="block rounded-xl px-3 py-2 text-sm text-on-surface hover:bg-surface-container-low">Vehicles</a>
-                    <a href="{% url 'emergency_dashboard' %}" class="block rounded-xl px-3 py-2 text-sm text-on-surface hover:bg-surface-container-low">Emergency</a>
-                    <a href="{% url 'report_dashboard' %}" class="block rounded-xl px-3 py-2 text-sm text-on-surface hover:bg-surface-container-low">Reports</a>
-                  {% endif %}
-                  <form method="post" action="{% url 'logout' %}">
-                    {% csrf_token %}
-                    <button type="submit" class="w-full rounded-xl px-3 py-2 text-left text-sm text-on-surface hover:bg-surface-container-low">Logout</button>
-                  </form>
-                {% else %}
-                  <a href="{% url 'login' %}" class="block rounded-xl px-3 py-2 text-sm text-on-surface hover:bg-surface-container-low">Login</a>
-                  <a href="{% url 'register' %}" class="block rounded-xl px-3 py-2 text-sm text-primary font-semibold hover:bg-surface-container-low">Register</a>
-                {% endif %}
-              </div>
-            </details>
+          <div class="nav-cta">
+            {% if user.is_authenticated %}
+              <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-ghost">Logout</button>
+              </form>
+              <a class="btn btn-primary" href="{% if user.role == 'driver' %}{% url 'driver_profile' %}{% else %}{% url 'dashboard_home' %}{% endif %}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                Dashboard
+              </a>
+            {% else %}
+              <a class="btn btn-ghost" href="{% url 'login' %}">Login</a>
+              <a class="btn btn-primary" href="{% url 'register' %}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                Get Started
+              </a>
+            {% endif %}
+            <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle light/dark mode" title="Toggle light/dark mode">
+              <span class="material-symbols-outlined i-moon">dark_mode</span>
+              <span class="material-symbols-outlined i-sun">light_mode</span>
+            </button>
+            <button class="burger" id="burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
           </div>
         </div>
       </header>
 
+      <div class="mobile-menu" id="mobileMenu">
+        <a href="{% url 'home' %}">Home</a>
+        {% if user.is_authenticated %}
+          {% if user.role == "driver" %}
+            <a href="{% url 'driver_profile' %}">Driver Profile</a>
+            <a href="{% url 'driver_vehicle_list' %}">Vehicles</a>
+            <a href="{% url 'my_trips' %}">My Trips</a>
+            <a href="{% url 'emergency_contact_list' %}">Emergency Contacts</a>
+          {% else %}
+            <a href="{% url 'dashboard_home' %}">Dashboard</a>
+            <a href="{% url 'admin_vehicle_dashboard' %}">Vehicles</a>
+            <a href="{% url 'emergency_dashboard' %}">Emergency</a>
+            <a href="{% url 'report_dashboard' %}">Reports</a>
+          {% endif %}
+          <div class="theme-toggle-row">
+            <span>Theme</span>
+            <button type="button" class="theme-toggle" data-theme-toggle-mobile aria-label="Toggle light/dark mode">
+              <span class="material-symbols-outlined i-moon">dark_mode</span>
+              <span class="material-symbols-outlined i-sun">light_mode</span>
+            </button>
+          </div>
+          <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit">Logout</button>
+          </form>
+        {% else %}
+          <a href="{% url 'login' %}">Login</a>
+          <div class="theme-toggle-row">
+            <span>Theme</span>
+            <button type="button" class="theme-toggle" data-theme-toggle-mobile aria-label="Toggle light/dark mode">
+              <span class="material-symbols-outlined i-moon">dark_mode</span>
+              <span class="material-symbols-outlined i-sun">light_mode</span>
+            </button>
+          </div>
+          <a class="btn btn-primary" href="{% url 'register' %}">Get Started</a>
+        {% endif %}
+      </div>
+
       <main class="flex-1 bg-grid-pattern">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
           {% if messages %}
             <div class="space-y-2 mb-6">
               {% for message in messages %}
-                <div class="p-3 rounded-xl text-sm border shadow-sm fade-in
-                  {% if message.tags == 'success' %}
-                    bg-green-50 text-green-800 border-green-200
-                  {% elif message.tags == 'error' %}
-                    bg-red-50 text-red-800 border-red-200
-                  {% elif message.tags == 'warning' %}
-                    bg-amber-50 text-amber-800 border-amber-200
-                  {% else %}
-                    bg-blue-50 text-blue-800 border-blue-200
-                  {% endif %}">
+                <div class="page-msg
+                  {% if message.tags == 'success' %}page-msg-success
+                  {% elif message.tags == 'error' %}page-msg-error
+                  {% elif message.tags == 'warning' %}page-msg-warning
+                  {% else %}page-msg-info{% endif %}">
                   {{ message }}
                 </div>
               {% endfor %}
@@ -209,15 +139,110 @@
         </div>
       </main>
 
-      <footer class="border-t border-outline-variant/40 bg-white/80 backdrop-blur-md">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-xs text-on-surface-variant flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div>© {% now "Y" %} SafeRide NG. Secure civic verification infrastructure.</div>
-          <div class="flex items-center gap-4">
-            <a href="{% url 'home' %}" class="hover:text-primary transition">Home</a>
-            <a href="{% url 'login' %}" class="hover:text-primary transition">Login</a>
+      <footer class="site-footer">
+        <div class="wrap">
+          <div class="foot-grid">
+            <div class="foot-brand">
+              <a class="logo" href="{% url 'home' %}" style="font-size:20px">
+                <svg viewBox="0 0 36 36" fill="none"><path d="M18 2l13 4.8v9.4c0 8.6-5.5 14.6-13 17.8C10.5 30.8 5 24.8 5 16.2V6.8L18 2z" fill="#0d5c3b"/><path d="M18 2l13 4.8v9.4c0 8.6-5.5 14.6-13 17.8V2z" fill="#2fe38d" opacity=".25"/><rect x="12" y="11" width="5" height="5" fill="#2fe38d"/><rect x="19" y="11" width="5" height="5" fill="#eaf5ef"/><rect x="12" y="18" width="5" height="5" fill="#eaf5ef"/><rect x="19" y="18" width="5" height="5" fill="#2fe38d"/></svg>
+                Ride<em>Garde</em>
+              </a>
+              <p>Civic trust infrastructure for Nigeria's road transport network. Scan before you enter.</p>
+            </div>
+            <div>
+              <h4>Platform</h4>
+              <a href="{% url 'home' %}">Home</a>
+              {% if not user.is_authenticated %}
+                <a href="{% url 'login' %}">Login</a>
+                <a href="{% url 'register' %}">Register</a>
+              {% endif %}
+              <a href="{% url 'driver_register' %}">Drivers</a>
+            </div>
+            <div>
+              <h4>Safety</h4>
+              <a href="{% url 'emergency_contact_list' %}">Emergency Contacts</a>
+              <a href="{% url 'report_dashboard' %}">Incident Reports</a>
+              <a href="{% url 'my_trips' %}">My Trips</a>
+            </div>
+            <div>
+              <h4>Admin</h4>
+              <a href="{% url 'dashboard_home' %}">Dashboard</a>
+              <a href="{% url 'admin_vehicle_dashboard' %}">Vehicle Registry</a>
+              <a href="{% url 'emergency_dashboard' %}">Command Center</a>
+            </div>
+          </div>
+          <div class="foot-bottom">
+            <span>© {% now "Y" %} RideGarde. Civic Trust &amp; Security Portal · Nigeria</span>
+            <span class="font-mono">BUILT · VETTED · VERIFIED</span>
           </div>
         </div>
       </footer>
     </div>
+
+    <script>
+      (() => {
+        const nav = document.getElementById("siteNav");
+        const burger = document.getElementById("burger");
+        const mobile = document.getElementById("mobileMenu");
+
+        function getTheme() {
+          return document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
+        }
+        function setTheme(theme) {
+          if (theme !== "dark" && theme !== "light") theme = "light";
+          document.documentElement.setAttribute("data-theme", theme);
+          try { localStorage.setItem("ridegarde-theme", theme); } catch (e) {}
+        }
+        function toggleTheme() {
+          setTheme(getTheme() === "dark" ? "light" : "dark");
+        }
+        const themeToggle = document.getElementById("themeToggle");
+        if (themeToggle) themeToggle.addEventListener("click", toggleTheme);
+        document.querySelectorAll("[data-theme-toggle-mobile]").forEach((btn) => {
+          btn.addEventListener("click", toggleTheme);
+        });
+
+        function onScroll() {
+          if (!nav) return;
+          if (window.scrollY > 8) nav.classList.add("scrolled");
+          else nav.classList.remove("scrolled");
+        }
+        window.addEventListener("scroll", onScroll, { passive: true });
+        onScroll();
+
+        if (burger && mobile) {
+          burger.addEventListener("click", () => {
+            const open = mobile.classList.toggle("open");
+            burger.setAttribute("aria-expanded", open ? "true" : "false");
+          });
+          document.addEventListener("click", (e) => {
+            if (!mobile.classList.contains("open")) return;
+            if (mobile.contains(e.target) || burger.contains(e.target)) return;
+            mobile.classList.remove("open");
+            burger.setAttribute("aria-expanded", "false");
+          });
+          document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && mobile.classList.contains("open")) {
+              mobile.classList.remove("open");
+              burger.setAttribute("aria-expanded", "false");
+            }
+          });
+        }
+
+        const io = ("IntersectionObserver" in window) ? new IntersectionObserver((entries) => {
+          entries.forEach((en) => {
+            if (en.isIntersecting) {
+              en.target.classList.add("in");
+              io.unobserve(en.target);
+            }
+          });
+        }, { threshold: 0.08 }) : null;
+        if (io) {
+          document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+        } else {
+          document.querySelectorAll(".reveal").forEach((el) => el.classList.add("in"));
+        }
+      })();
+    </script>
   </body>
 </html>

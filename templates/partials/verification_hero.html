@@ -1,15 +1,15 @@
-<div class="text-center fade-in">
+<div class="text-center fade-in reveal in">
   {% if tone == 'green' %}
-    <div class="w-20 h-20 rounded-full bg-green-50 text-green-700 flex items-center justify-center mx-auto shadow-sm">
+    <div class="w-20 h-20 rounded-full bg-green-soft text-primary flex items-center justify-center mx-auto shadow-soft">
   {% elif tone == 'red' %}
-    <div class="w-20 h-20 rounded-full bg-red-50 text-red-700 flex items-center justify-center mx-auto shadow-sm">
+    <div class="w-20 h-20 rounded-full bg-red-soft text-tertiary flex items-center justify-center mx-auto shadow-soft">
   {% elif tone == 'amber' %}
-    <div class="w-20 h-20 rounded-full bg-amber-50 text-amber-700 flex items-center justify-center mx-auto shadow-sm">
+    <div class="w-20 h-20 rounded-full bg-amber-soft text-secondary flex items-center justify-center mx-auto shadow-soft">
   {% else %}
-    <div class="w-20 h-20 rounded-full bg-blue-50 text-primary flex items-center justify-center mx-auto shadow-sm">
+    <div class="w-20 h-20 rounded-full bg-primary-fixed text-primary flex items-center justify-center mx-auto shadow-soft">
   {% endif %}
     <span class="material-symbols-outlined text-5xl">{{ icon }}</span>
   </div>
-  <h1 class="mt-6 text-3xl md:text-4xl font-bold text-primary tracking-[-0.02em]">{{ title }}</h1>
+  <h1 class="mt-6 text-3xl md:text-4xl font-bold text-on-surface tracking-[-0.02em] font-display">{{ title }}</h1>
   <p class="text-sm md:text-base text-on-surface-variant max-w-2xl mx-auto mt-3">{{ description }}</p>
 </div>

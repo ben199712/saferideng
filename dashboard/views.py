@@ -3,11 +3,14 @@ from django.contrib.auth.decorators import user_passes_test
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views import View
 
 from accounts.models import User
 from drivers.models import DriverProfile
+
+from core.notifications import notify_user_admin_action
 
 
 def is_admin_user(user):
@@ -28,15 +31,31 @@ class DashboardHomeView(AdminRequiredMixin, View):
     """Unified dashboard home for SafeRide admins."""
 
     def get(self, request, *args, **kwargs):
+        today = timezone.now().date()
+        expiry_cutoff = today + timezone.timedelta(days=90)
         total_drivers = DriverProfile.objects.count()
         pending = DriverProfile.objects.filter(verification_status=DriverProfile.VerificationStatus.pending).count()
         verified = DriverProfile.objects.filter(verification_status=DriverProfile.VerificationStatus.verified).count()
         flagged = DriverProfile.objects.filter(verification_status=DriverProfile.VerificationStatus.flagged).count()
+        expiring_soon = DriverProfile.objects.filter(
+            driver_license_expiry_date__isnull=False,
+            driver_license_expiry_date__lte=expiry_cutoff,
+            driver_license_expiry_date__gte=today,
+        ).count()
 
         pending_qs = (
             DriverProfile.objects.select_related("user")
             .filter(verification_status=DriverProfile.VerificationStatus.pending)
             .order_by("-created_at")[:10]
+        )
+        expiring_profiles = (
+            DriverProfile.objects.select_related("user")
+            .filter(
+                driver_license_expiry_date__isnull=False,
+                driver_license_expiry_date__lte=expiry_cutoff,
+                driver_license_expiry_date__gte=today,
+            )
+            .order_by("driver_license_expiry_date")[:10]
         )
 
         ctx = {
@@ -45,8 +64,10 @@ class DashboardHomeView(AdminRequiredMixin, View):
                 "pending": pending,
                 "verified": verified,
                 "flagged": flagged,
+                "expiring_soon": expiring_soon,
             },
             "pending_drivers": pending_qs,
+            "expiring_profiles": expiring_profiles,
         }
         return render(request, "dashboard/dashboard_home.html", ctx)
 
@@ -61,9 +82,29 @@ class DriverApprovalView(AdminRequiredMixin, View):
         if action == "approve":
             driver_profile.verification_status = DriverProfile.VerificationStatus.verified
             driver_profile.is_approved = True
+            notify_user_admin_action(
+                admin_user=request.user,
+                target_user=driver_profile.user,
+                action_title="Your driver profile has been approved",
+                action_summary="Your driver profile has been verified and approved by SafeRide operations.",
+                details=[
+                    f"Status: {driver_profile.get_verification_status_display()}",
+                ],
+                request=request,
+            )
         elif action == "flag":
             driver_profile.verification_status = DriverProfile.VerificationStatus.flagged
             driver_profile.is_approved = False
+            notify_user_admin_action(
+                admin_user=request.user,
+                target_user=driver_profile.user,
+                action_title="Your driver profile needs attention",
+                action_summary="Your driver profile was flagged for review by SafeRide operations.",
+                details=[
+                    f"Status: {driver_profile.get_verification_status_display()}",
+                ],
+                request=request,
+            )
         else:
             return redirect(reverse("dashboard_home"))
 

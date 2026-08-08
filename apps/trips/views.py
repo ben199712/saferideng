@@ -10,6 +10,7 @@ from django.views import View
 
 from accounts.models import User
 from apps.emergency.models import EmergencyAlert
+from apps.emergency.services import notify_sos
 from apps.reports.models import IncidentReport
 from apps.vehicles.models import VehicleQRCode
 
@@ -159,6 +160,7 @@ class TripSosView(TripAccessMixin, View):
             message="SOS alert triggered from the trip tracking page.",
             triggered_by=request.user if request.user.is_authenticated else None,
         )
+        notify_sos(alert, request)
         messages.success(request, "Emergency alert sent to SafeRide responders.")
         return redirect("trip_sos_confirmation", uuid=alert.uuid)
 

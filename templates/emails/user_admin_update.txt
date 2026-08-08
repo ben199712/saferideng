@@ -1,0 +1,16 @@
+{{ title }}
+
+{{ summary }}
+
+{% if admin_email or admin_name %}
+Admin: {{ admin_name }} {{ admin_email }}
+{% endif %}
+
+{% if details %}
+Details:
+{% for item in details %}
+- {{ item }}
+{% endfor %}
+{% endif %}
+
+SafeRide NG
