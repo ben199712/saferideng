@@ -137,7 +137,7 @@ class TrackingViewTests(TrackingTestMixin, TestCase):
         self.assertContains(response, str(share.trip.driver.uuid))
         self.assertContains(response, share.trip.vehicle.vin)
 
-    def test_shayour-resend-api-key-here(self):
+    def test_share_list_shows_received_trips(self):
         TripShare.objects.create(trip=self.trip, sharer=self.driver, receiver=self.receiver)
         self.client.force_login(self.receiver)
 

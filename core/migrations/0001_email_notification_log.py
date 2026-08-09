@@ -37,11 +37,11 @@ class Migration(migrations.Migration):
         ),
         migrations.AddIndex(
             model_name="emailnotificationlog",
-            index=models.Index(fields=["event_type", "created_at"], name="coyour-resend-api-key-here"),
+            index=models.Index(fields=["event_type", "created_at"], name="core_emailn_event_t_7b7347_idx"),
         ),
         migrations.AddIndex(
             model_name="emailnotificationlog",
-            index=models.Index(fields=["to_email", "created_at"], name="coyour-resend-api-key-here"),
+            index=models.Index(fields=["to_email", "created_at"], name="core_emailn_to_emai_45a4ba_idx"),
         ),
     ]
 

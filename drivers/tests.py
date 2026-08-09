@@ -175,7 +175,7 @@ class DriverProfileViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Select a valid LGA for the chosen state.")
 
-    def test_sensitive_driver_fields_ayour-resend-api-key-here(self):
+    def test_sensitive_driver_fields_are_encrypted(self):
         self.client.post(reverse("driver_register"), self.valid_payload())
 
         with connection.cursor() as cursor:

@@ -42,7 +42,7 @@ class TripShareFlowTests(TestCase):
         self.factory = RequestFactory()
         self.client = Client()
 
-    def test_public_shayour-resend-api-key-here(self):
+    def test_public_share_url_contains_secret_and_tracking_path(self):
         request = self.factory.get("/")
         request.user = self.driver
 
@@ -53,7 +53,7 @@ class TripShareFlowTests(TestCase):
         self.assertIn(f"secret={share.share_secret}", share_url)
         self.assertNotIn(reverse("trip_share", kwargs={"uuid": self.trip.uuid}), share_url)
 
-    def test_trip_shayour-resend-api-key-here(self):
+    def test_trip_share_page_contains_tracking_link(self):
         response = self.client.get(reverse("trip_share", kwargs={"uuid": self.trip.uuid}))
         share = TripShare.objects.get(trip=self.trip, receiver=None)
 
